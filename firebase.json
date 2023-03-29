@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "/Users/liljayrgudmundsdottir/Documents/DTU/PersonalDataUse/FoodWise/.venv/lib",
+    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
