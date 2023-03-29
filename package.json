@@ -1,0 +1,12 @@
+{
+  "name": "foodwise",
+  "version": "1.0.0",
+  "description": "Final Project for 02808 Personal Data Interaction for Mobile and Wearables",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
