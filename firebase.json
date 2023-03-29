@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": "/Users/liljayrgudmundsdottir/Documents/DTU/PersonalDataUse/FoodWise/.venv/lib",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
