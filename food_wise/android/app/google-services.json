@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "184013061272",
+    "firebase_url": "https://foodwise-32afa-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "foodwise-32afa",
+    "storage_bucket": "foodwise-32afa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:184013061272:android:34a639316b42b0b36fa4ed",
+        "android_client_info": {
+          "package_name": "com.example.food_wise"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "184013061272-cbpsf0h9uiigmjrl0er05j60h7spr0li.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1PUva05LDzvYwkXeec3H80x1woaV9bQI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "184013061272-cbpsf0h9uiigmjrl0er05j60h7spr0li.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "184013061272-rg7pdf1f8qpda230bm2sguspvsf32b1o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.foodWise"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
