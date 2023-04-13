@@ -2,10 +2,10 @@
   "name": "foodwise",
   "version": "1.0.0",
   "description": "Final Project for 02808 Personal Data Interaction for Mobile and Wearables",
-  "main": "index.js",
+  "main": "main.dart",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "flutter run -d /food_wise -t /food_wise/pubspec.yaml"
+    "build": "cd food_wise && flutter run"
   },
   "keywords": [],
   "author": "",
