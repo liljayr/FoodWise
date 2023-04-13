@@ -11,7 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: npm ci && npm run build
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: 'stable'
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
