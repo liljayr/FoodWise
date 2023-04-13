@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 //Import firestore database
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
+import 'package:meta/meta.dart';
+import 'package:intl/intl.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+/*class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -23,7 +27,7 @@ class MyApp extends StatelessWidget {
     .get()
     .then((QuerySnapshot querySnapshot) {
         querySnapshot.docs.forEach((doc) {
-            print(doc["name"]);
+            print(doc["user_name"]);
         });
     }).toString();
     return MaterialApp(
@@ -45,11 +49,44 @@ class MyApp extends StatelessWidget {
   }
   Widget _fireSearch(){
 
+  }*/
+
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'My App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: FutureBuilder<QuerySnapshot>(
+        future: FirebaseFirestore.instance.collection('Food').get(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              var names = snapshot.data?.docs?.map((doc) => doc['name'] as String).join(', ') ?? '';
+              final b_timestamp = snapshot.data?.docs?.first['Bought'] as Timestamp;
+              final b_date = b_timestamp.toDate(); // Convert the timestamp to a DateTime object
+              final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(b_date); // Format the date as a string
+              final e_timestamp = snapshot.data?.docs?.first['Expires'] as Timestamp;
+              final e_date = e_timestamp.toDate(); // Convert the timestamp to a DateTime object
+              final e_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(e_date); // Format the date as a string
+              return MyHomePage(key: ValueKey('my_home_page'), title: names, boughtTime: b_formattedDate, expireTime: e_formattedDate);
+            }
+          } else {
+            return CircularProgressIndicator();
+          }
+        },
+      ),
+    );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({required Key key, required this.title, required this.boughtTime, required this.expireTime}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -61,7 +98,8 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
-
+  final String boughtTime;
+  final String expireTime;
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -113,13 +151,25 @@ class _MyHomePageState extends State<MyHomePage> {
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
+          //bought time
           children: <Widget>[
+             Text(
+              'Bought Time:',
+              style: TextStyle(fontSize: 25),
+            ),
+            SizedBox(height: 10),
             Text(
-              'You have pushed the button this many times:',
+              widget.boughtTime,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+              'Expiration Time:',
+              style: TextStyle(fontSize: 25),
+            ),
+            SizedBox(height: 10),
+            Text(
+              widget.expireTime,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -140,8 +190,9 @@ Future<Widget> _fireSearch() async {
   var name = "";
   for (var queryDocumentSnapshot in querySnapshot.docs) {
     Map<String, dynamic> data = queryDocumentSnapshot.data();
-    name = data['name'];
+    name = data['user_name'];
   }
+  print(name);
   return Scaffold(
   body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -169,3 +220,4 @@ Future<Widget> _fireSearch() async {
   //   },
   // );
 }
+
