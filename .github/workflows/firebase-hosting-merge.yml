@@ -9,15 +9,15 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: subosito/flutter-action@v1
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.7.11'
       - name: Install dependencies
         run: flutter pub get
         working-directory: ./food_wise
-      - name: Build iOS release
-        run: flutter build ios --target-platform=ios
+      - name: Build for the web
+        run: flutter build web
         working-directory: ./food_wise
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
