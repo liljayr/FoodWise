@@ -17,7 +17,7 @@ jobs:
         run: flutter pub get
         working-directory: ./food_wise
       - name: Build iOS release
-        run: flutter build ios
+        run: flutter build ios --target-platform=ios
         working-directory: ./food_wise
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
