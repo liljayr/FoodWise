@@ -5,8 +5,7 @@
   "main": "main.dart",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "flutter build ios",
-    "build:foodwise": "cd food_wise && flutter build ios"
+    "build": "cd food_wise && flutter build ios"
   },
   "keywords": [],
   "author": "",
