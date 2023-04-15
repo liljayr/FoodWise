@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     .get()
     .then((QuerySnapshot querySnapshot) {
         querySnapshot.docs.forEach((doc) {
-            print(doc["name"]);
+            print(doc["user_name"]);
         });
     }).toString();
     return MaterialApp(
@@ -140,8 +140,9 @@ Future<Widget> _fireSearch() async {
   var name = "";
   for (var queryDocumentSnapshot in querySnapshot.docs) {
     Map<String, dynamic> data = queryDocumentSnapshot.data();
-    name = data['name'];
+    name = data['user_name'];
   }
+  print(name);
   return Scaffold(
   body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -149,7 +150,7 @@ Future<Widget> _fireSearch() async {
         child: Column(
   children: <Widget>[
             Text(
-              name,
+              querySnapshot as String,
             ),
           ],
         )
