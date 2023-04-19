@@ -9,6 +9,8 @@ import 'firebase_options.dart';
 import 'package:meta/meta.dart';
 import 'package:intl/intl.dart';
 
+import 'pages/main_page.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -67,7 +69,7 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
-              var names = snapshot.data?.docs?.map((doc) => doc['name'] as String).join(', ') ?? '';
+              var names = snapshot.data?.docs.map((doc) => doc['name'] as String).join(', ') ?? '';
               final b_timestamp = snapshot.data?.docs?.first['Bought'] as Timestamp;
               final b_date = b_timestamp.toDate(); // Convert the timestamp to a DateTime object
               final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(b_date); // Format the date as a string
@@ -171,6 +173,15 @@ class _MyHomePageState extends State<MyHomePage> {
               widget.expireTime,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
+            ElevatedButton(
+              child: const Text('Open route'),
+              onPressed: () {
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Main()),
+              );
+            },
+            )
           ],
         ),
       ),
@@ -195,8 +206,6 @@ Future<Widget> _fireSearch() async {
   print(name);
   return Scaffold(
   body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
   children: <Widget>[
             Text(
