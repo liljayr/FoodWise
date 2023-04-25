@@ -56,44 +56,58 @@ class MyApp extends StatelessWidget {
 class Home extends StatefulWidget {
   const Home({Key? key, required this.title, required this.boughtTime, required this.expireTime}) : super(key: key);
 
-  final String title;
   final String boughtTime;
   final String expireTime;
+  final String title;
 
   @override
   _HState createState() => _HState();
 }
 
 class _HState extends State<Home> {
-  // var title = "test";
-  // var boughtTime = "test";
-  // var expireTime = "test";
+  var productName = "";
+  var boughtTime = "";
+  var expireTime = "";
 
-  // Future<void> onLoad() async {
-  //   var collection = FirebaseFirestore.instance.collection('Food');
-  //   var snapshot1 = collection.snapshots();
-  //   var snapshot = await collection.get();
-  //   print("AAAAAAAA");
-  //   print(snapshot.docs.first.data());
-  //   print(snapshot.docs[0]);
-  //   this.productName = snapshot.docs.first.data()['name'] as String;
-  //   print(this.productName);
-  //   // if (snapshot1.isEmpty == ConnectionState.done) {
-  //     // if (snapshot) {
-  //     //   Text('Error: ${snapshot.error}');
-  //     // } else {
-  //       // var names = snapshot.docs.data?.docs.map((doc) => doc['name'] as String).join(', ') ?? '';
-  //       // final b_timestamp = snapshot.data?.docs.first['Bought'] as Timestamp;
-  //       // final b_date = b_timestamp.toDate(); // Convert the timestamp to a DateTime object
-  //       // final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(b_date); // Format the date as a string
-  //       // final e_timestamp = snapshot.data?.docs.first['Expires'] as Timestamp;
-  //       // final e_date = e_timestamp.toDate(); // Convert the timestamp to a DateTime object
-  //       // final e_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(e_date); // Format the date as a string
-  //       // Home(key: ValueKey('my_home_page'), title: names, boughtTime: b_formattedDate, expireTime: e_formattedDate);
-  //     // }
-  //   // }
-  // }
+  @override
+  void initState() {
+    super.initState();
+    onLoad();
+  }
 
+  Future<void> onLoad() async {
+    var collection = FirebaseFirestore.instance.collection('Food');
+    var snapshot1 = collection.snapshots();
+    var snapshot = await collection.get();
+    print("AAAAAAAA");
+    print(snapshot.docs.first.data());
+    print(snapshot.docs[0]);
+    var data = snapshot.docs.first.data();
+    if (data != null && data['name'] != null) {
+      setState(() {
+        this.productName = data['name'] as String;
+      });
+    }
+    //this.productName = snapshot.docs.first.data()['name'] as String;
+    print("product name:");
+    print(this.productName);
+    // if (snapshot1.isEmpty == ConnectionState.done) {
+    //   if (snapshot) {
+    //     Text('Error: ${snapshot.error}');
+    //   } else {
+    //     var names = snapshot.docs.data?.docs.map((doc) => doc['name'] as String).join(', ') ?? '';
+    //     final b_timestamp = snapshot.data?.docs.first['Bought'] as Timestamp;
+    //     final b_date = b_timestamp.toDate(); // Convert the timestamp to a DateTime object
+    //     final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(b_date); // Format the date as a string
+    //     final e_timestamp = snapshot.data?.docs.first['Expires'] as Timestamp;
+    //     final e_date = e_timestamp.toDate(); // Convert the timestamp to a DateTime object
+    //     final e_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(e_date); // Format the date as a string
+    //     Home(key: ValueKey('my_home_page'), title: names, boughtTime: b_formattedDate, expireTime: e_formattedDate);
+    //   }
+    // }
+  }
+
+  
   @override
   Widget build(BuildContext context){
     return Scaffold(

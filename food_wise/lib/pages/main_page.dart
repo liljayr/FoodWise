@@ -32,7 +32,7 @@ class Main extends StatefulWidget {
 class _MainPageState extends State<Main> {
   var productName = "";
   List pages = [
-    Home(title: "aaaa", expireTime: "sss", boughtTime: "rrr",),
+    Home(title: "aaa", expireTime: "rrr", boughtTime: "eee"),
     Chart(),
     Recipes(),
     Profile()
