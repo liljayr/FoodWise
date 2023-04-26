@@ -143,21 +143,7 @@ class _CState extends State<Charts> {
             ),
       ),
       body: Center(
-        child: LineChart(
-        LineChartData(
-            lineBarsData: [
-              LineChartBarData(
-                spots: widget.spent,
-                //const [FlSpot(1681768800585, 5), FlSpot(1681855200947, 10), FlSpot(1681941600673, 0), FlSpot(1682028000546, 0), FlSpot(1682114400862, 10), FlSpot(1682200800875, 0), FlSpot(1682287200197, 5)],
-                //points,//points.map((point) => FlSpot(point.date.millisecondsSinceEpoch.toDouble(), point.price.toDouble())).toList(),
-                isCurved: true,
-                dotData: FlDotData(
-                  show: false,
-                ),
-              ),
-            ],
-          ),
-      ),
+        child: LineChartWidget(widget.spent),
         )
     );
   }
