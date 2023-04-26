@@ -38,7 +38,7 @@ class RecipeList extends StatelessWidget {
                 top: 12,
                 left: 12,
                 //right: 12,
-                child: Image.asset('lib/images/avocadoSalad.png'),
+                child: Image.asset("h"),
               ),
               Positioned(
                 top: 22,
