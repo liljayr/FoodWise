@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'My App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
       home: FutureBuilder<QuerySnapshot>(
         future: FirebaseFirestore.instance.collection('Food').get(),
@@ -107,18 +107,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  // void _incrementCounter() {
+  //   setState(() {
+  //     // This call to setState tells the Flutter framework that something has
+  //     // changed in this State, which causes it to rerun the build method below
+  //     // so that the display can reflect the updated values. If we changed
+  //     // _counter without calling setState(), then the build method would not be
+  //     // called again, and so nothing would appear to happen.
+  //     _counter++;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -132,101 +132,72 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text("FoodWise"),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
-          //bought time
           children: <Widget>[
-             Text(
-              'Bought Time:',
-              style: TextStyle(fontSize: 25),
-            ),
-            SizedBox(height: 10),
-            Text(
-              widget.boughtTime,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'Expiration Time:',
-              style: TextStyle(fontSize: 25),
-            ),
-            SizedBox(height: 10),
-            Text(
-              widget.expireTime,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
             ElevatedButton(
-              child: const Text('Open route'),
+              child: const Text('Avocado'),
               onPressed: () {
                 Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Main()),
-              );
-            },
+                  context,
+                  MaterialPageRoute(builder: (context) => Main()),
+                );
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Veggies'),
+              onPressed: () {
+                // Navigator.push(
+                  // context,
+                  // MaterialPageRoute(builder: (context) => Main()),
+                // );
+              },
             )
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),// This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
 
 
-Future<Widget> _fireSearch() async {
-  var collection = FirebaseFirestore.instance.collection('users');
-  var querySnapshot = await collection.get();
-  var name = "";
-  for (var queryDocumentSnapshot in querySnapshot.docs) {
-    Map<String, dynamic> data = queryDocumentSnapshot.data();
-    name = data['user_name'];
-  }
-  print(name);
-  return Scaffold(
-  body: Center(
-        child: Column(
-  children: <Widget>[
-            Text(
-              querySnapshot as String,
-            ),
-          ],
-        )
-        ) 
-   ); // return new StreamBuilder(
-  //   stream: FirebaseFirestore.instance
-  //   .collection('users')
-  //   .where('title', isEqualTo: queryText)
-  //   .snapshots(),
-  //   builder: (context, snapshot) {
-  //     if (!snapshot.hasData) return new Text('Loading...');
-  //     return new ListView.builder(
-  //       itemCount: snapshot.data.documents.length,
-  //       itemBuilder: (context, index) =>
-  //           _buildListItem(snapshot.data.documents[index]),
-  //     );
-  //   },
-  // );
-}
+// Future<Widget> _fireSearch() async {
+//   var collection = FirebaseFirestore.instance.collection('users');
+//   var querySnapshot = await collection.get();
+//   var name = "";
+//   for (var queryDocumentSnapshot in querySnapshot.docs) {
+//     Map<String, dynamic> data = queryDocumentSnapshot.data();
+//     name = data['user_name'];
+//   }
+//   print(name);
+//   return Scaffold(
+//   body: Center(
+//         child: Column(
+//   children: <Widget>[
+//             Text(
+//               querySnapshot as String,
+//             ),
+//           ],
+//         )
+//         ) 
+//    ); // return new StreamBuilder(
+//   //   stream: FirebaseFirestore.instance
+//   //   .collection('users')
+//   //   .where('title', isEqualTo: queryText)
+//   //   .snapshots(),
+//   //   builder: (context, snapshot) {
+//   //     if (!snapshot.hasData) return new Text('Loading...');
+//   //     return new ListView.builder(
+//   //       itemCount: snapshot.data.documents.length,
+//   //       itemBuilder: (context, index) =>
+//   //           _buildListItem(snapshot.data.documents[index]),
+//   //     );
+//   //   },
+//   // );
+// }
 

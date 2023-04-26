@@ -33,86 +33,36 @@ class _MainPageState extends State<Main> {
   var productName = "";
   List pages = [
     Home(title: "aaa", expireTime: "rrr", boughtTime: "eee"),
-    Chart(),
+    Charts(saved: [], spent: [], co2: [], water: []),
     Recipes(),
     Profile()
   ];
   int currentIndex = 0;
 
-  Future<Widget> getPage(int index) async {
-    switch (index){
-        case 0:
-            print("WHYYYY");
-            var collection = FirebaseFirestore.instance.collection('Food');
-            var snapshot = await collection.get();
-            var title = snapshot.docs.first.data()['name'] as String;
-            return Home(title:title, expireTime: "oogabooga", boughtTime: "aaaaa");
-            break;
-        // case 1:
-        //     return PageTwo(data:data);
-        //     break;
-        default:
-            var collection = FirebaseFirestore.instance.collection('Food');
-            var snapshot = await collection.get();
-            var title = snapshot.docs.first.data()['name'] as String;
-            return Home(title:title, expireTime: "oogabooga", boughtTime: "aaaaa");
-        break;
-    }
+  Future<String> onLoad() async {
+    // var productName = "";
+    var collection = FirebaseFirestore.instance.collection('Food');
+    var snapshot1 = collection.snapshots();
+    var snapshot = await collection.get();
+    print("BBBBBBB");
+    print(snapshot.docs.first.data());
+    print(snapshot.docs[0]);
+    productName = snapshot.docs.first.data()['name'] as String;
+    print(productName);
+    return productName;
   }
-
-  // Future<String> onLoad() async {
-  //   // var productName = "";
-  //   var collection = FirebaseFirestore.instance.collection('Food');
-  //   var snapshot1 = collection.snapshots();
-  //   var snapshot = await collection.get();
-  //   print("BBBBBBB");
-  //   print(snapshot.docs.first.data());
-  //   print(snapshot.docs[0]);
-  //   productName = snapshot.docs.first.data()['name'] as String;
-  //   print(productName);
-  //   return productName;
-  // }
 
   void onTap(int index) {
     setState(() {
       currentIndex = index;
-      // this.onLoad();
-      // if(index == 0){
-      //   var collection = FirebaseFirestore.instance.collection('Food');
-      //   var snapshot = await collection.get();
-      //   var title = snapshot.docs.first.data()['name'] as String;
-      //   Navigator.push(context,
-      // MaterialPageRoute(builder: (_) => Home(title: title, boughtTime: "wohoo", expireTime: "works",)));
-      // }
+      this.onLoad();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<QuerySnapshot>(
-        future: FirebaseFirestore.instance.collection('Food').get(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              var names = snapshot.data?.docs.map((doc) => doc['name'] as String).join(', ') ?? '';
-              final b_timestamp = snapshot.data?.docs?.first['Bought'] as Timestamp;
-              final b_date = b_timestamp.toDate(); // Convert the timestamp to a DateTime object
-              final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(b_date); // Format the date as a string
-              final e_timestamp = snapshot.data?.docs?.first['Expires'] as Timestamp;
-              final e_date = e_timestamp.toDate(); // Convert the timestamp to a DateTime object
-              final e_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(e_date); // Format the date as a string
-              return Home(key: ValueKey('my_home_page'), title: names, boughtTime: b_formattedDate, expireTime: e_formattedDate);
-            }
-          } else {
-            return CircularProgressIndicator();
-          }
-        },
-      ),
-      //FutureBuilder<QuerySnapshot>(
-        //builder:getPage(currentIndex)),//pages[currentIndex],
+      body: pages[currentIndex],
       floatingActionButton: Container(
         decoration: const BoxDecoration(shape: BoxShape.circle, boxShadow: [
           BoxShadow(color: Colors.white, spreadRadius: 7, blurRadius: 1)
