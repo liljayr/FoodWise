@@ -33,7 +33,7 @@ class _MainPageState extends State<Main> {
   var productName = "";
   List pages = [
     Home(title: "aaa", expireTime: "rrr", boughtTime: "eee"),
-    Charts(saved: [], spent: [], co2: [], water: []),
+    Charts(),
     Recipes(),
     Profile()
   ];
