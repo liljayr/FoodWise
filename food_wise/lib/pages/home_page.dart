@@ -26,7 +26,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'FoodWise',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const  Color(0xFF44ACA1)),
       ),
       // home: FutureBuilder<QuerySnapshot>(
       //   future: FirebaseFirestore.instance.collection('Food').get(),

@@ -21,26 +21,40 @@ import 'package:intl/intl.dart';
 //   runApp(Main());
 // }
 
+late String _pageType = "";
 
 class Main extends StatefulWidget {
-  const Main({Key? key}) : super(key: key);
+  const Main({Key? key, required this.pageType}) : super(key: key);
+
+  final String pageType;
   
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class _MainPageState extends State<Main> {
+  // late String _pageType = "";
+
+  @override
+  void initState() {
+    _pageType = widget.pageType;
+    super.initState();
+  }
+
   var productName = "";
   List pages = [
     Home(title: "aaa", expireTime: "rrr", boughtTime: "eee"),
-    Charts(),
+    Charts(pageType: _pageType),
     Recipes(),
     Profile()
   ];
   int currentIndex = 0;
+  // String pageType = this.pageType;
 
   Future<String> onLoad() async {
     // var productName = "";
+    print("WHAT PAGE MAN");
+    print(_pageType);
     var collection = FirebaseFirestore.instance.collection('Food');
     var snapshot1 = collection.snapshots();
     var snapshot = await collection.get();
@@ -70,7 +84,7 @@ class _MainPageState extends State<Main> {
         child: FloatingActionButton(
           onPressed: () {},
           child: const Icon(Icons.qr_code_2_rounded),
-          backgroundColor: Colors.green,
+          backgroundColor: Color(0xFF44ACA1),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -80,8 +94,8 @@ class _MainPageState extends State<Main> {
         selectedFontSize: 0,
         onTap: onTap,
         currentIndex: currentIndex,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.lightGreen.withOpacity(0.5),
+        selectedItemColor: Color(0xFF44ACA1),
+        unselectedItemColor: Color(0xFF44ACA1).withOpacity(0.5),
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: [

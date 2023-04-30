@@ -60,7 +60,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'My App',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const  Color(0xFF44ACA1)),
       ),
       home: FutureBuilder<QuerySnapshot>(
         future: FirebaseFirestore.instance.collection('Food').get(),
@@ -145,17 +146,17 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Main()),
+                  MaterialPageRoute(builder: (context) => Main(pageType: "Avocado",)),
                 );
               },
             ),
             ElevatedButton(
               child: const Text('Veggies'),
               onPressed: () {
-                // Navigator.push(
-                  // context,
-                  // MaterialPageRoute(builder: (context) => Main()),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Main(pageType: "Veggie",)),
+                );
               },
             )
           ],
