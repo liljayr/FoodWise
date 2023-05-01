@@ -8,7 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:food_wise/pages/chart_page.dart';
 import 'package:food_wise/pages/home_page.dart';
 import 'package:food_wise/pages/profile_page.dart';
-import 'package:food_wise/pages/recipes_page.dart';
+import 'package:food_wise/pages/recipe_page.dart';
 import '../firebase_options.dart';
 import 'package:meta/meta.dart';
 import 'package:intl/intl.dart';
