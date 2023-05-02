@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'My App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch().copyWith(
@@ -70,14 +71,27 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
-              var names = snapshot.data?.docs.map((doc) => doc['name'] as String).join(', ') ?? '';
-              final b_timestamp = snapshot.data?.docs?.first['Bought'] as Timestamp;
-              final b_date = b_timestamp.toDate(); // Convert the timestamp to a DateTime object
-              final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(b_date); // Format the date as a string
-              final e_timestamp = snapshot.data?.docs?.first['Expires'] as Timestamp;
-              final e_date = e_timestamp.toDate(); // Convert the timestamp to a DateTime object
-              final e_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(e_date); // Format the date as a string
-              return MyHomePage(key: ValueKey('my_home_page'), title: names, boughtTime: b_formattedDate, expireTime: e_formattedDate);
+              var names = snapshot.data?.docs
+                      .map((doc) => doc['name'] as String)
+                      .join(', ') ??
+                  '';
+              final b_timestamp =
+                  snapshot.data?.docs?.first['Bought'] as Timestamp;
+              final b_date = b_timestamp
+                  .toDate(); // Convert the timestamp to a DateTime object
+              final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss')
+                  .format(b_date); // Format the date as a string
+              final e_timestamp =
+                  snapshot.data?.docs?.first['Expires'] as Timestamp;
+              final e_date = e_timestamp
+                  .toDate(); // Convert the timestamp to a DateTime object
+              final e_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss')
+                  .format(e_date); // Format the date as a string
+              return MyHomePage(
+                  key: ValueKey('my_home_page'),
+                  title: names,
+                  boughtTime: b_formattedDate,
+                  expireTime: e_formattedDate);
             }
           } else {
             return CircularProgressIndicator();
@@ -89,7 +103,12 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({required Key key, required this.title, required this.boughtTime, required this.expireTime}) : super(key: key);
+  MyHomePage(
+      {required Key key,
+      required this.title,
+      required this.boughtTime,
+      required this.expireTime})
+      : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -165,7 +184,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
 
 // Future<Widget> _fireSearch() async {
 //   var collection = FirebaseFirestore.instance.collection('users');

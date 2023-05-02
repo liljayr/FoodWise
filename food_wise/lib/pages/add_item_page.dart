@@ -34,8 +34,8 @@ class AddItem extends StatefulWidget {
 
 class _AddItemState extends State<AddItem> {
   var productName = "";
-  var quantity = "";
-  var price = "";
+  var quantity = 0;
+  var price = 0;
   var color = "";
   Timestamp expirationDate = new Timestamp.now();
   Timestamp boughtDate = new Timestamp.now();
@@ -215,7 +215,7 @@ class _AddItemState extends State<AddItem> {
                           return null;
                         },
                         onChanged: (value) {
-                          quantity = value;
+                          quantity = int.parse(value);
                         },
                       ),
                     // ListView.builder(
@@ -302,7 +302,7 @@ class _AddItemState extends State<AddItem> {
                             return null;
                           },
                           onChanged: (value) {
-                            price = value;
+                            price = int.parse(value);
                           },
                         ),
                       // ListView.builder(
