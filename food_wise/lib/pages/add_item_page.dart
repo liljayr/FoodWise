@@ -89,49 +89,43 @@ class _AddItemState extends State<AddItem> {
   }
 
   String catPicker() {
-    if(fruitVeggieCheckbox){
+    if (fruitVeggieCheckbox) {
       color = "0xFF1BA209";
       return "Fruit/Veggie";
-    }
-    else if(meatCheckbox){
+    } else if (meatCheckbox) {
       color = "0xFF832205";
       return "Meat";
-    }
-    else if(dairyCheckbox){
+    } else if (dairyCheckbox) {
       color = "0xFF0B75D8";
       return "Dairy";
-    }
-    else{
+    } else {
       return "No Category";
     }
   }
 
   String storagePicker() {
-    if(fridgeCheckbox){
+    if (fridgeCheckbox) {
       return "Fridge";
-    }
-    else if(pantryCheckbox){
+    } else if (pantryCheckbox) {
       return "Pantry";
-    }
-    else if(freezeCheckbox){
+    } else if (freezeCheckbox) {
       return "Freezer";
-    }
-    else{
+    } else {
       return "No Storage";
     }
   }
 
   Future<void> addToDB() async {
     Map<String, dynamic> newData = {
-      "name":productName,
-      "boughtDate":boughtDate,
-      "category":catPicker(),
-      "storage":storagePicker(),
-      "expirationDate":expirationDate,
-      "price":price,
-      "quantity":quantity,
-      "unit":unitSelection,
-      "color":color
+      "name": productName,
+      "boughtDate": boughtDate,
+      "category": catPicker(),
+      "storage": storagePicker(),
+      "expirationDate": expirationDate,
+      "price": price,
+      "quantity": quantity,
+      "unit": unitSelection,
+      "color": color
     };
     var collection = FirebaseFirestore.instance.collection('AvocadoFood');
     var snapshot = await collection.get();
@@ -146,9 +140,8 @@ class _AddItemState extends State<AddItem> {
     print("added");
   }
 
-  
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     // var query = "";
     // List<String> matchQuery = [];
     // for (var fruit in searchTerms) {
@@ -157,23 +150,50 @@ class _AddItemState extends State<AddItem> {
     //   }
     // }
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-              'Add Product',
-              style: TextStyle(fontSize: 25),
+        appBar: AppBar(
+          title: Text(
+            'Add Product',
+            style: TextStyle(fontSize: 25),
+          ),
+        ),
+        body: Center(
+            child: Form(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
+                  Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 21, left: 39, bottom: 6),
+              child: Text("Product",
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF343434),
+                      fontFamily: 'Montserat',
+                      fontWeight: FontWeight.w500)),
             ),
-      ),
-      body: Center(
-        child: Form(
-          child:Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text("Product"),
-              TextFormField(
+            Padding(
+              padding: const EdgeInsets.only(left: 39, right: 39),
+              child: TextFormField(
                 // initialValue: "Enter or select a product",
-                decoration: new InputDecoration.collapsed(
-                  hintText: 'Enter or select a product'
-                ),
+                decoration: new InputDecoration(
+                    hintText: 'Enter a name of product',
+                    hintStyle: TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFFA9A9A9),
+                        fontFamily: 'Montserat',
+                        fontWeight: FontWeight.w500),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                            width: 1, color: Color(0xFFA9A9A9)),
+                        borderRadius: BorderRadius.circular(9)),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          width: 2,
+                          color: Color(0xFF44ACA1),
+                        ),
+                        borderRadius: BorderRadius.circular(9))
+
+                    //enabled: OutlineInputBorder(borderSide: BorderSide(width: 312, color: Color(0xFFA9A9A9))),
+                    ),
                 // The validator receives the text that the user has entered.
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -187,26 +207,53 @@ class _AddItemState extends State<AddItem> {
                   print(productName);
                 },
               ),
-              // ListView.builder(
-              //   itemCount: searchTerms.length,
-              //   itemBuilder: (context, index) {
-              //     var result = searchTerms[index];
-              //     return ListTile(
-              //       title: Text(result),
-              //     );
-              //   },
-              // ),
-              Row(
-                children: [
-                  Expanded(
+            ),
+            // ListView.builder(
+            //   itemCount: searchTerms.length,
+            //   itemBuilder: (context, index) {
+            //     var result = searchTerms[index];
+            //     return ListTile(
+            //       title: Text(result),
+            //     );
+            //   },
+            // ),
+            Row(
+              children: [
+                Expanded(
                     child: Column(
-                    children: [
-                      Text("Quantity"),
-                      TextFormField(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 18, left: 39, bottom: 6),
+                      child: Text("Quantity",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 39),
+                      child: TextFormField(
                         // initialValue: "Enter quantity",
-                        decoration: new InputDecoration.collapsed(
-                          hintText: 'Enter quantity'
-                        ),
+                        decoration: new InputDecoration(
+                            hintText: 'Enter quantity',
+                            hintStyle: TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFFA9A9A9),
+                                fontFamily: 'Montserat',
+                                fontWeight: FontWeight.w500),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                    width: 1, color: Color(0xFFA9A9A9)),
+                                borderRadius: BorderRadius.circular(9)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  width: 2,
+                                  color: Color(0xFF44ACA1),
+                                ),
+                                borderRadius: BorderRadius.circular(9))),
                         // The validator receives the text that the user has entered.
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -218,6 +265,7 @@ class _AddItemState extends State<AddItem> {
                           quantity = int.parse(value);
                         },
                       ),
+                    ),
                     // ListView.builder(
                     //   itemCount: searchTerms.length,
                     //   itemBuilder: (context, index) {
@@ -227,21 +275,37 @@ class _AddItemState extends State<AddItem> {
                     //     );
                     //   },
                     // ),
-                    ],
-                    )
-                  ),
-                  Expanded(
+                  ],
+                )),
+                Expanded(
                     child: Column(
-                    children: [
-                      Text("Unit"),
-                      DropdownButton<String>(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 12, top: 18, bottom: 6),
+                      child: Text("Unit",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: DropdownButton<String>(
                         value: unitSelection,
-                        icon: const Icon(Icons.arrow_downward),
+                        borderRadius: BorderRadius.circular(9),
+                        icon: const Icon(Icons.arrow_downward, size: 18),
                         elevation: 16,
-                        style: const TextStyle(color: Colors.deepPurple),
+                        style: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFFA9A9A9),
+                            fontFamily: 'Montserat',
+                            fontWeight: FontWeight.w500),
                         underline: Container(
                           height: 2,
-                          color: Colors.deepPurpleAccent,
+                          color: Color(0xFFA9A9A9),
                         ),
                         onChanged: (String? value) {
                           // This is called when the user selects an item.
@@ -249,26 +313,28 @@ class _AddItemState extends State<AddItem> {
                             unitSelection = value!;
                           });
                         },
-                        items: units.map<DropdownMenuItem<String>>((String value) {
+                        items:
+                            units.map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
                           );
                         }).toList(),
-                      )
-                      // TextFormField(
-                      //   // initialValue: "Select unit",
-                      //   decoration: new InputDecoration.collapsed(
-                      //     hintText: 'Select unit'
-                      //   ),
-                      //   // The validator receives the text that the user has entered.
-                      //   validator: (value) {
-                      //     if (value == null || value.isEmpty) {
-                      //       return 'Please enter some text';
-                      //     }
-                      //     return null;
-                      //   },
-                      // ),
+                      ),
+                    )
+                    // TextFormField(
+                    //   // initialValue: "Select unit",
+                    //   decoration: new InputDecoration.collapsed(
+                    //     hintText: 'Select unit'
+                    //   ),
+                    //   // The validator receives the text that the user has entered.
+                    //   validator: (value) {
+                    //     if (value == null || value.isEmpty) {
+                    //       return 'Please enter some text';
+                    //     }
+                    //     return null;
+                    //   },
+                    // ),
                     // ListView.builder(
                     //   itemCount: searchTerms.length,
                     //   itemBuilder: (context, index) {
@@ -278,22 +344,49 @@ class _AddItemState extends State<AddItem> {
                     //     );
                     //   },
                     // ),
-                    ],
-                  )
-                  )
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Text("Price"),
-                        TextFormField(
+                  ],
+                ))
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 39, top: 18, bottom: 6),
+                        child: Text("Price",
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF343434),
+                                fontFamily: 'Montserat',
+                                fontWeight: FontWeight.w500)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 39,
+                        ),
+                        child: TextFormField(
                           // initialValue: "Enter price",
-                          decoration: new InputDecoration.collapsed(
-                            hintText: 'Enter price'
-                          ),
+                          decoration: new InputDecoration(
+                              hintText: 'Enter price',
+                              hintStyle: TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFFA9A9A9),
+                                  fontFamily: 'Montserat',
+                                  fontWeight: FontWeight.w500),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      width: 1, color: Color(0xFFA9A9A9)),
+                                  borderRadius: BorderRadius.circular(9)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    width: 2,
+                                    color: Color(0xFF44ACA1),
+                                  ),
+                                  borderRadius: BorderRadius.circular(9))),
                           // The validator receives the text that the user has entered.
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -305,6 +398,7 @@ class _AddItemState extends State<AddItem> {
                             price = int.parse(value);
                           },
                         ),
+                      ),
                       // ListView.builder(
                       //   itemCount: searchTerms.length,
                       //   itemBuilder: (context, index) {
@@ -314,54 +408,115 @@ class _AddItemState extends State<AddItem> {
                       //     );
                       //   },
                       // ),
-                      ],
+                    ],
+                  ),
+                ),
+                Expanded(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 12, top: 18, bottom: 6),
+                      child: Text("Expiry date",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                    ),
+                    SfDateRangePicker(
+                      view: DateRangePickerView.month,
+                      selectionMode: DateRangePickerSelectionMode.single,
+                      monthViewSettings:
+                          DateRangePickerMonthViewSettings(firstDayOfWeek: 1),
+                      onSelectionChanged: (value) {
+                        var timestamp = DateTime.parse(value.value.toString());
+                        expirationDate = Timestamp.fromDate(timestamp);
+                      },
+                      // onSelectionChanged: _onSelectionChanged,
+                      // selectionMode: DateRangePickerSelectionMode.range,
+                    ),
+                    // TextFormField(
+                    //   // initialValue: "Expiry date",
+                    //   decoration: new InputDecoration.collapsed(
+                    //     hintText: 'Expiry date'
+                    //   ),
+                    //   // The validator receives the text that the user has entered.
+                    //   validator: (value) {
+                    //     if (value == null || value.isEmpty) {
+                    //       return 'Please enter some text';
+                    //     }
+                    //     return null;
+                    //   },
+                    // ),
+                    // ListView.builder(
+                    //   itemCount: searchTerms.length,
+                    //   itemBuilder: (context, index) {
+                    //     var result = searchTerms[index];
+                    //     return ListTile(
+                    //       title: Text(result),
+                    //     );
+                    //   },
+                    // ),
+                  ],
+                ))
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                    child: Row(children: [
+                  Expanded(
+                    child: CheckboxListTile(
+                      title: Text("Fruit/Veggie",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                      value: fruitVeggieCheckbox,
+                      onChanged: (value) {
+                        setState(() {
+                          fridgeCheckbox = !fridgeCheckbox;
+                        });
+                      },
                     ),
                   ),
                   Expanded(
-                    child: Column(
-                      children: [
-                        Text("Experiation Date"),
-                        SfDateRangePicker(
-                          view: DateRangePickerView.month,
-                          selectionMode: DateRangePickerSelectionMode.single,
-                          monthViewSettings: DateRangePickerMonthViewSettings(firstDayOfWeek: 1),
-                          onSelectionChanged: (value) {
-                            var timestamp = DateTime.parse(value.value.toString());
-                            expirationDate = Timestamp.fromDate(timestamp);
-                          },
-                          // onSelectionChanged: _onSelectionChanged,
-                          // selectionMode: DateRangePickerSelectionMode.range,
-                        ),
-                        // TextFormField(
-                        //   // initialValue: "Expiry date",
-                        //   decoration: new InputDecoration.collapsed(
-                        //     hintText: 'Expiry date'
-                        //   ),
-                        //   // The validator receives the text that the user has entered.
-                        //   validator: (value) {
-                        //     if (value == null || value.isEmpty) {
-                        //       return 'Please enter some text';
-                        //     }
-                        //     return null;
-                        //   },
-                        // ),
-                      // ListView.builder(
-                      //   itemCount: searchTerms.length,
-                      //   itemBuilder: (context, index) {
-                      //     var result = searchTerms[index];
-                      //     return ListTile(
-                      //       title: Text(result),
-                      //     );
-                      //   },
-                      // ),
-                      ],
-                    )
-                  )
-                ],
-              ),
-              Row(
-                children: [
+                    child: CheckboxListTile(
+                      title: Text("Meat",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                      value: meatCheckbox,
+                      onChanged: (value) {
+                        setState(() {
+                          freezeCheckbox = !freezeCheckbox;
+                        });
+                      },
+                    ),
+                  ),
                   Expanded(
+<<<<<<< HEAD
+                    child: CheckboxListTile(
+                      title: Text("Dairy",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                      value: dairyCheckbox,
+                      onChanged: (value) {
+                        setState(() {
+                          pantryCheckbox = !pantryCheckbox;
+                        });
+                      },
+                    ),
+=======
                     child: Row(
                       children: [
                         Expanded(
@@ -399,62 +554,91 @@ class _AddItemState extends State<AddItem> {
                         )
                       ]
                     )
+>>>>>>> d0aad701bf0d7ec43d9e8890ae28a806a0b7f16e
                   )
-                ],
-              ),
-              Row(
-                children: [
+                ]))
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: Row(children: [
                   Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CheckboxListTile(
-                            title:Text("Fridge"),
-                            value: fridgeCheckbox,
-                            onChanged: (value) {
-                              setState(() {
-                                fridgeCheckbox = !fridgeCheckbox;
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: CheckboxListTile(
-                            title:Text("Freezer"),
-                            value: freezeCheckbox,
-                            onChanged: (value) {
-                              setState(() {
-                                freezeCheckbox = !freezeCheckbox;
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: CheckboxListTile(
-                            title:Text("Pantry"),
-                            value: pantryCheckbox,
-                            onChanged: (value) {
-                              setState(() {
-                                pantryCheckbox = !pantryCheckbox;
-                              });
-                            },
-                          ),
-                        )
-                      ]
-                    )
+                    child: CheckboxListTile(
+                      title: Text("Fridge",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                      value: fridgeCheckbox,
+                      onChanged: (value) {
+                        setState(() {
+                          fridgeCheckbox = !fridgeCheckbox;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: CheckboxListTile(
+                      title: Text("Freezer",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                      value: freezeCheckbox,
+                      onChanged: (value) {
+                        setState(() {
+                          freezeCheckbox = !freezeCheckbox;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: CheckboxListTile(
+                      title: Text("Pantry",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                      value: pantryCheckbox,
+                      onChanged: (value) {
+                        setState(() {
+                          pantryCheckbox = !pantryCheckbox;
+                        });
+                      },
+                    ),
                   )
-                ],
-              ),
-              // ListView.builder(
-              //   itemCount: searchTerms.length,
-              //   itemBuilder: (context, index) {
-              //     var result = searchTerms[index];
-              //     return ListTile(
-              //       title: Text(result),
-              //     );
-              //   },
-              // ),
-              ElevatedButton(
+                ]))
+              ],
+            ),
+            // ListView.builder(
+            //   itemCount: searchTerms.length,
+            //   itemBuilder: (context, index) {
+            //     var result = searchTerms[index];
+            //     return ListTile(
+            //       title: Text(result),
+            //     );
+            //   },
+            // ),
+            Padding(
+              padding: const EdgeInsets.only(left: 39, top: 30),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.all(12),
+
+                  fixedSize: Size(312, 54),
+                  textStyle: TextStyle(
+                      fontSize: 17,
+                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFFFFFFFF)),
+                  backgroundColor: Color(0xFF44ACA1), // background color
+                  elevation: 0, // elevation of button
+                  //shadowColor: Colors.
+                ),
                 child: const Text('Add product'),
                 onPressed: () {
                   print("Here are all the values");
@@ -469,12 +653,10 @@ class _AddItemState extends State<AddItem> {
                   addToDB();
                   print("AADDEDDD to DB");
                   Navigator.pop(context);
-              },
-              )
-            ]
-            ),
-          )
-        )
-    );
+                },
+              ),
+            )
+          ]),
+        )));
   }
 }
