@@ -61,6 +61,10 @@ class _AddItemState extends State<AddItem> {
   bool freezeCheckbox = false;
   bool pantryCheckbox = false;
 
+  bool fruitVeggieCheckbox = false;
+  bool meatCheckbox = false;
+  bool dairyCheckbox = false;
+
   @override
   void initState() {
     super.initState();
@@ -291,6 +295,49 @@ class _AddItemState extends State<AddItem> {
                       //   },
                       // ),
                       ],
+                    )
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: CheckboxListTile(
+                            title:Text("Fruit/Veggie"),
+                            value: fruitVeggieCheckbox,
+                            onChanged: (value) {
+                              setState(() {
+                                fridgeCheckbox = !fridgeCheckbox;
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: CheckboxListTile(
+                            title:Text("Meat"),
+                            value: meatCheckbox,
+                            onChanged: (value) {
+                              setState(() {
+                                freezeCheckbox = !freezeCheckbox;
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: CheckboxListTile(
+                            title:Text("Dairy"),
+                            value: dairyCheckbox,
+                            onChanged: (value) {
+                              setState(() {
+                                pantryCheckbox = !pantryCheckbox;
+                              });
+                            },
+                          ),
+                        )
+                      ]
                     )
                   )
                 ],
