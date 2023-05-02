@@ -36,7 +36,9 @@ class _AddItemState extends State<AddItem> {
   var productName = "";
   var quantity = "";
   var price = "";
+  var color = "";
   Timestamp expirationDate = new Timestamp.now();
+  Timestamp boughtDate = new Timestamp.now();
   // var expirationDate = "";
 
   List<String> searchTerms = [
@@ -84,6 +86,64 @@ class _AddItemState extends State<AddItem> {
         this.productName = data['name'] as String;
       });
     }
+  }
+
+  String catPicker() {
+    if(fruitVeggieCheckbox){
+      color = "0xFF1BA209";
+      return "Fruit/Veggie";
+    }
+    else if(meatCheckbox){
+      color = "0xFF832205";
+      return "Meat";
+    }
+    else if(dairyCheckbox){
+      color = "0xFF0B75D8";
+      return "Dairy";
+    }
+    else{
+      return "No Category";
+    }
+  }
+
+  String storagePicker() {
+    if(fridgeCheckbox){
+      return "Fridge";
+    }
+    else if(pantryCheckbox){
+      return "Pantry";
+    }
+    else if(freezeCheckbox){
+      return "Freezer";
+    }
+    else{
+      return "No Storage";
+    }
+  }
+
+  Future<void> addToDB() async {
+    Map<String, dynamic> newData = {
+      "name":productName,
+      "boughtDate":boughtDate,
+      "category":catPicker(),
+      "storage":storagePicker(),
+      "expirationDate":expirationDate,
+      "price":price,
+      "quantity":quantity,
+      "unit":unitSelection,
+      "color":color
+    };
+    var collection = FirebaseFirestore.instance.collection('AvocadoFood');
+    var snapshot = await collection.get();
+    var index = int.parse(snapshot.docs.last.id) + 1;
+    // var index = collection.orderBy("createdAt", descending: true).limit(1);
+    print("IS this the right index for adding");
+    print(index);
+
+    var ref = FirebaseFirestore.instance.collection("AvocadoFood");
+
+    await ref.doc('$index').set(newData);
+    print("added");
   }
 
   
@@ -406,6 +466,8 @@ class _AddItemState extends State<AddItem> {
                   print(fridgeCheckbox);
                   print(freezeCheckbox);
                   print(pantryCheckbox);
+                  addToDB();
+                  print("AADDEDDD to DB");
                   Navigator.pop(context);
               },
               )
