@@ -52,7 +52,7 @@ Future<List<String>> loadProductName() async {
 
   Future<List<dynamic>> fetchRecipes(String productName) async {
     final response = await http.get(Uri.parse(
-        'https://api.spoonacular.com/recipes/findByIngredients?ingredients=$productName&number=10&apiKey=b35037ce334b4323b05c88f226fbd54e'));
+        'https://api.spoonacular.com/recipes/findByIngredients?ingredients=$productName&number=10&apiKey=4872b1e2b7b14272b28d763ea9f3654a'));
 
     if (response.statusCode == 200) {
       List<dynamic> recipes = json.decode(response.body);
@@ -70,7 +70,7 @@ Future<List<String>> loadProductName() async {
 
 Future<Map<String, dynamic>> fetchRecipe(int recipeId) async {
   final response = await http.get(Uri.parse(
-      'https://api.spoonacular.com/recipes/$recipeId/information?includeNutrition=true&apiKey=b35037ce334b4323b05c88f226fbd54e'));
+      'https://api.spoonacular.com/recipes/$recipeId/information?includeNutrition=true&apiKey=4872b1e2b7b14272b28d763ea9f3654a'));
 
   if (response.statusCode == 200) {
     Map<String, dynamic> recipeData = json.decode(response.body);
@@ -92,7 +92,7 @@ Future<Map<String, dynamic>> fetchRecipe(int recipeId) async {
 
     // Get recipe instructions
     final instructionResponse = await http.get(Uri.parse(
-        'https://api.spoonacular.com/recipes/$recipeId/analyzedInstructions?apiKey=b35037ce334b4323b05c88f226fbd54e'));
+        'https://api.spoonacular.com/recipes/$recipeId/analyzedInstructions?apiKey=4872b1e2b7b14272b28d763ea9f3654a'));
 
     if (instructionResponse.statusCode == 200) {
       List<dynamic> instructions = json.decode(instructionResponse.body);
