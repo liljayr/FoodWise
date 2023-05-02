@@ -102,12 +102,25 @@ class _ChartPageState extends State<Charts> {
     var dataListEaten = snapshotEaten.docs.toList();
     foodEatenAvo = dataListEaten.map((e) => ChartData(e.get('category'),
       e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
+
+    print("Get left food");
       
     var collectionFood = FirebaseFirestore.instance.collection('AvocadoFood');
     var snapshotFood = await collectionFood.get();
     var dataListFood = snapshotFood.docs.toList();
+    print("about to go");
+    print(dataListFood);
+    for(var i = 0; i < dataListFood.length; i++){
+      print(dataListFood[i]);
+      print("aaaaaaa");
+      print(dataListFood[i]['quantity']);
+    }
+    print("is this right");
     foodLeftAvo = dataListFood.map((e) => ChartData(e.get('category'),
       e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
+
+    print("is this ruight????????");
+    print(foodLeftAvo);
       
     var collectionWasted = FirebaseFirestore.instance.collection('AvocadoWasted');
     var snapshotWasted = await collectionWasted.get();
