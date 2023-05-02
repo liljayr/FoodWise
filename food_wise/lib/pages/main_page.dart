@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 //Import firestore database
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:food_wise/pages/add_item_page.dart';
 import 'package:food_wise/pages/chart_page.dart';
 import 'package:food_wise/pages/home_page.dart';
 import 'package:food_wise/pages/profile_page.dart';
@@ -21,26 +22,42 @@ import 'package:intl/intl.dart';
 //   runApp(Main());
 // }
 
+late String _pageType = "";
 
 class Main extends StatefulWidget {
-  const Main({Key? key}) : super(key: key);
+  const Main({Key? key, required this.pageType}) : super(key: key);
+
+  final String pageType;
   
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class _MainPageState extends State<Main> {
+  // late String _pageType = "";
+
+  @override
+  void initState() {
+    _pageType = widget.pageType;
+    print("PLEASE WORK PLEEEAAASSEEE");
+    print(_pageType);
+    super.initState();
+  }
+
   var productName = "";
   List pages = [
     Home(title: "aaa", expireTime: "rrr", boughtTime: "eee"),
-    Charts(saved: [], spent: [], co2: [], water: []),
+    Charts(pageType: _pageType),
     Recipes(),
     Profile()
   ];
   int currentIndex = 0;
+  // String pageType = this.pageType;
 
   Future<String> onLoad() async {
     // var productName = "";
+    print("WHAT PAGE MAN");
+    print(_pageType);
     var collection = FirebaseFirestore.instance.collection('Food');
     var snapshot1 = collection.snapshots();
     var snapshot = await collection.get();
@@ -68,9 +85,14 @@ class _MainPageState extends State<Main> {
           BoxShadow(color: Colors.white, spreadRadius: 7, blurRadius: 1)
         ]),
         child: FloatingActionButton(
-          onPressed: () {},
-          child: const Icon(Icons.qr_code_2_rounded),
-          backgroundColor: Colors.green,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddItem()),
+            );
+          },
+          child: const Icon(Icons.add),
+          backgroundColor: Color(0xFF44ACA1),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -80,8 +102,8 @@ class _MainPageState extends State<Main> {
         selectedFontSize: 0,
         onTap: onTap,
         currentIndex: currentIndex,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.lightGreen.withOpacity(0.5),
+        selectedItemColor: Color(0xFF44ACA1),
+        unselectedItemColor: Color(0xFF44ACA1).withOpacity(0.5),
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: [
