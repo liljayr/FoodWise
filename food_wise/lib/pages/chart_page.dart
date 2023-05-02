@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_chart_json/Sales.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:food_wise/pages/second_chart_page.dart';
 import 'package:food_wise/widget/bar_chart_2_widget.dart';
 import 'package:food_wise/widget/barchart_test.dart';
 import 'package:intl/intl.dart';
@@ -16,6 +17,7 @@ class Charts extends StatefulWidget {
 
   @override
   _ChartPageState createState() {
+    String _pageType = pageType;
     return _ChartPageState();
   }
 }
@@ -32,6 +34,8 @@ class _ChartPageState extends State<Charts> {
   late List<charts.Series<Spending, String>> _seriesBarData;
   late List<Spending> mydata;
   late List<ChartData> wasteData;
+  bool _visible = true;
+  int detailsChart = -1;
 
   _generateData(mydata) {
     _seriesBarData = [];// List<charts.Series<Spending, String>>();
@@ -122,61 +126,155 @@ class _ChartPageState extends State<Charts> {
   //       )
   //   );
   // }
+
+  void setVisibility() {
+    print("Changing visibility pleeease");
+    setState(() {
+      _visible = !_visible;
+    });
+  }
+
+
+  Widget TextDis(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Container(
+          child: Center(
+            child: Column(
+              children: [
+                Text('aaaaaa')
+              ],
+            ),
+          ),
+        ),
+      )
+    );
+  }
+
+
+
   @override
-    Widget _buildChart(BuildContext context, List<Spending> saledata) {
-      print("akdjhfaksdjhfksdjhf");
-        print(saledata[0].date.toDate().day);
-        print(DateFormat('EEEE').format(saledata[0].date.toDate()));
-        // final List<Spending> chartData = saledata;
-        // <Spending>[
-        //    ChartData('Germany', 128, 129),
-        //    ChartData('Russia', 123, 92),
-        //    ChartData('Norway', 107, 106),
-        //    ChartData('USA', 87, 95),
-        // ];
-        return Scaffold(
-            body: Center(
-                child: Container(
+  Widget _buildChart(BuildContext context, List<Spending> saledata) {
+    // bool _visible = true;
+    print("akdjhfaksdjhfksdjhf");
+    print(saledata[0].date.toDate().day);
+    print(DateFormat('EEEE').format(saledata[0].date.toDate()));
+    // final List<Spending> chartData = saledata;
+    // <Spending>[
+    //    ChartData('Germany', 128, 129),
+    //    ChartData('Russia', 123, 92),
+    //    ChartData('Norway', 107, 106),
+    //    ChartData('USA', 87, 95),
+    // ];
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Container(
+            child: Column(
+              children: [
+                // GestureDetector(
+                //   behavior: HitTestBehavior.translucent,
+                //   onTap: (){
+                //     print("Container clicked");
+                //   },
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 2.0
+                      )
+                    ),
+                    child: SfCircularChart(
+                      // title: ChartTitle(
+                      //   text: "Food usage"
+                      // ),
+                      legend: Legend(isVisible: true),
+                      // onChartTouchInteractionUp:(ChartTouchInteractionArgs args){
+                      //   print("AAAAAAAA am i touching this now???");
+                      //   // print(args);
+                      //   // print(args.position.dx.toString());
+                      //   // print(args.position.dy.toString());
+                      //   setVisibility();
+                      //   print(detailsChart);
+                      // },
+                      tooltipBehavior: TooltipBehavior(enable: true),
+                      series: <CircularSeries>[
+                        DoughnutSeries<ChartData, String>(
+                          dataSource: wasteData,
+                          explode: true,
+                          onPointTap: (ChartPointDetails details) {
+                            print("WTFFFF");
+                            print("Point index");
+                            print(details.pointIndex);
+                            detailsChart = details.pointIndex!;
+                            print("series index");
+                            print(details.seriesIndex);
+                            setVisibility();
+                            // TextDis(context);
+                            // setState(() {
+                            //   _visible = !_visible;
+                            //   print("Changing visible");
+                            //   print(_visible);
+                            // });
+                          },
+                          selectionBehavior: SelectionBehavior(enable: true),
+                          pointColorMapper:(ChartData data,  _) => data.color,
+                          xValueMapper: (ChartData data, _) => data.x,
+                          yValueMapper: (ChartData data, _) => data.y,
+                          // name: ((ChartData data, _) => data.x) as String,
+                          dataLabelMapper: (ChartData data, _) => data.x,
+                          dataLabelSettings: DataLabelSettings(
+                            isVisible: true
+                          )
+                        )
+                      ]
+                    )
+                  // ),
+                ),
+                AnimatedOpacity(
+                  opacity: !_visible ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 500),
+                  child: Container(
+                    child: Column(
+                      children: [
+                        Text("AAAAAA")
+                        // ChartDetails(pageType: "avocado",),
+                      ],
+                    ),
+                  ),
+                ),
+                AnimatedOpacity(
+                  opacity: _visible ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 500),
                   child: Column(
                     children: [
                       Container(
-                        child: SfCircularChart(
-                          tooltipBehavior: TooltipBehavior(enable: true),
-                          series: <CircularSeries>[
-                            DoughnutSeries<ChartData, String>(
-                                dataSource: wasteData,
-                                pointColorMapper:(ChartData data,  _) => data.color,
-                                xValueMapper: (ChartData data, _) => data.x,
-                                yValueMapper: (ChartData data, _) => data.y,
-                                name: 'Gold',
-                                dataLabelMapper: (ChartData data, _) => data.x,
-                                dataLabelSettings: DataLabelSettings(
-                                  isVisible: true
-                                )
-                            )
-                          ])
-                      ),
-                      Container(
                         decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15.0),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 2.0
-                    )
-                  ),
+                          borderRadius: BorderRadius.circular(15.0),
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 2.0
+                          )
+                        ),
                         child: SfCartesianChart(
-                      title: ChartTitle(
-                        text: "Spending",
-                        alignment: ChartAlignment.near
-                      ),
-                        primaryXAxis: CategoryAxis(),
-                        legend: Legend(
-                          isVisible: true,
-                          position: LegendPosition.top
+                          title: ChartTitle(
+                            text: "Spending",
+                            alignment: ChartAlignment.near
                           ),
-                        series: <CartesianSeries>[
-                            ColumnSeries<Spending, String>(
+                          primaryXAxis: CategoryAxis(),
+                          legend: Legend(
+                            isVisible: true,
+                            position: LegendPosition.top
+                            ),
+                            series: <CartesianSeries>[
+                              ColumnSeries<Spending, String>(
                                 dataSource: saledata,
+                                // onPointTap: (ChartPointDetails details) {
+                                //   print(details.pointIndex);
+                                //   print(details.seriesIndex);
+                                // },
+                                // selectionBehavior: SelectionBehavior(enable: true),
                                 // dataLabelSettings: DataLabelSettings(isVisible: true),
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(5),
@@ -186,9 +284,14 @@ class _ChartPageState extends State<Charts> {
                                 yValueMapper: (Spending data, _) => data.price,
                                 color: Color(0xFF44ACA1),
                                 name: "Money Spent"
-                            ),
-                            ColumnSeries<Spending, String>(
+                              ),
+                              ColumnSeries<Spending, String>(
                                 dataSource: saledata,
+                                // onPointTap: (ChartPointDetails details) {
+                                //   print(details.pointIndex);
+                                //   print(details.seriesIndex);
+                                // },
+                                // selectionBehavior: SelectionBehavior(enable: true),
                                 // dataLabelSettings: DataLabelSettings(isVisible: true),
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(5),
@@ -198,54 +301,58 @@ class _ChartPageState extends State<Charts> {
                                 yValueMapper: (Spending data, _) => data.waste,
                                 color: Color(0xFFF7B24A),
                                 name: "Money Wasted"
-                            )
-                        ]
-                        )
-                    ),
-                    Row(
-                      children: [
-                        Center(
-                          child: Container(
-                            decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15.0),
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 2.0
-                            )
-                          ),
-                            child: Column(
-                              children: [
-                                Text('Water Use'),
-                                Text('320 L'),   // 320 liters per avocado https://greenly.earth/en-us/blog/ecology-news/what-is-the-avocados-environmental-impact
-                              ],
-                            )
-                          ),
+                              )
+                            ]
+                          )
                         ),
-                        Center(
-                          child: Container(
-                            decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15.0),
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 2.0
-                            )
+                        Row(
+                          children: [
+                            Center(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15.0),
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 2.0
+                                )
+                              ),
+                              child: Column(
+                                children: [
+                                  Text('Water Use'),
+                                  Text('320 L'),   // 320 liters per avocado https://greenly.earth/en-us/blog/ecology-news/what-is-the-avocados-environmental-impact
+                                ],
+                              )
+                            ),
                           ),
-                            child: Column(
-                              children:[
-                                Text('CO2 Emissions'),
-                                Text('425 g'),   // 850 g for 2 avocados https://8billiontrees.com/carbon-offsets-credits/carbon-ecological-footprint-calculators/carbon-footprint-of-avocado/#:~:text=The%20carbon%20footprint%20of%20two%20avocados%20is%20rated%20at%20850%20grams
-                              ]
+                          Center(
+                            child: Container(
+                              decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15.0),
+                              border: Border.all(
+                                color: Colors.grey,
+                                width: 2.0
+                              )
+                            ),
+                              child: Column(
+                                children:[
+                                  Text('CO2 Emissions'),
+                                  Text('425 g'),   // 850 g for 2 avocados https://8billiontrees.com/carbon-offsets-credits/carbon-ecological-footprint-calculators/carbon-footprint-of-avocado/#:~:text=The%20carbon%20footprint%20of%20two%20avocados%20is%20rated%20at%20850%20grams
+                                ]
+                              )
                             )
                           )
-                        )
-                      ],
-                    )
+                        ],
+                      )
                     ]
                   )
-                ),
+                )
+              ]
             )
-        );
-    }
+          ),
+        )
+      )
+    );
+  }
 
      
 }

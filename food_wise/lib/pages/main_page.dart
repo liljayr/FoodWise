@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 //Import firestore database
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:food_wise/pages/add_item_page.dart';
 import 'package:food_wise/pages/chart_page.dart';
 import 'package:food_wise/pages/home_page.dart';
 import 'package:food_wise/pages/profile_page.dart';
@@ -38,6 +39,8 @@ class _MainPageState extends State<Main> {
   @override
   void initState() {
     _pageType = widget.pageType;
+    print("PLEASE WORK PLEEEAAASSEEE");
+    print(_pageType);
     super.initState();
   }
 
@@ -82,8 +85,13 @@ class _MainPageState extends State<Main> {
           BoxShadow(color: Colors.white, spreadRadius: 7, blurRadius: 1)
         ]),
         child: FloatingActionButton(
-          onPressed: () {},
-          child: const Icon(Icons.qr_code_2_rounded),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddItem()),
+            );
+          },
+          child: const Icon(Icons.add),
           backgroundColor: Color(0xFF44ACA1),
         ),
       ),
