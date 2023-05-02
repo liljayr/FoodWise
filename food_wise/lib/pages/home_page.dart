@@ -12,10 +12,10 @@ import 'package:intl/intl.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(MyApp());
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
+  // runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -25,24 +25,25 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'FoodWise',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const  Color(0xFF44ACA1)),
       ),
       // home: FutureBuilder<QuerySnapshot>(
       //   future: FirebaseFirestore.instance.collection('Food').get(),
       //   builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
       //     if (snapshot.connectionState == ConnectionState.done) {
-      //       // if (snapshot.hasError) {
-      //       //   return Text('Error: ${snapshot.error}');
-      //       // } else {
-      //       //   var names = snapshot.data?.docs.map((doc) => doc['name'] as String).join(', ') ?? '';
-      //       //   final b_timestamp = snapshot.data?.docs.first['Bought'] as Timestamp;
-      //       //   final b_date = b_timestamp.toDate(); // Convert the timestamp to a DateTime object
-      //       //   final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(b_date); // Format the date as a string
-      //       //   final e_timestamp = snapshot.data?.docs.first['Expires'] as Timestamp;
-      //       //   final e_date = e_timestamp.toDate(); // Convert the timestamp to a DateTime object
-      //       //   final e_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(e_date); // Format the date as a string
-      //       //   return Home(key: ValueKey('my_home_page'), title: names, boughtTime: b_formattedDate, expireTime: e_formattedDate);
-      //       // }
+      //       if (snapshot.hasError) {
+      //         return Text('Error: ${snapshot.error}');
+      //       } else {
+      //         var names = snapshot.data?.docs.map((doc) => doc['name'] as String).join(', ') ?? '';
+      //         final b_timestamp = snapshot.data?.docs.first['Bought'] as Timestamp;
+      //         final b_date = b_timestamp.toDate(); // Convert the timestamp to a DateTime object
+      //         final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(b_date); // Format the date as a string
+      //         final e_timestamp = snapshot.data?.docs.first['Expires'] as Timestamp;
+      //         final e_date = e_timestamp.toDate(); // Convert the timestamp to a DateTime object
+      //         final e_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(e_date); // Format the date as a string
+      //         return Home(key: ValueKey('my_home_page'), title: names, boughtTime: b_formattedDate, expireTime: e_formattedDate);
+      //       }
       //     } else {
       //       return CircularProgressIndicator();
       //     }

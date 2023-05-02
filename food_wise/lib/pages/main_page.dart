@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 //Import firestore database
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:food_wise/pages/add_item_page.dart';
 import 'package:food_wise/pages/chart_page.dart';
 import 'package:food_wise/pages/home_page.dart';
 import 'package:food_wise/pages/profile_page.dart';
@@ -21,25 +22,42 @@ import 'package:intl/intl.dart';
 //   runApp(Main());
 // }
 
-class Main extends StatefulWidget {
-  const Main({Key? key}) : super(key: key);
+late String _pageType = "";
 
+class Main extends StatefulWidget {
+  const Main({Key? key, required this.pageType}) : super(key: key);
+
+  final String pageType;
+  
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class _MainPageState extends State<Main> {
+  // late String _pageType = "";
+
+  @override
+  void initState() {
+    _pageType = widget.pageType;
+    print("PLEASE WORK PLEEEAAASSEEE");
+    print(_pageType);
+    super.initState();
+  }
+
   var productName = "";
   List pages = [
     Home(title: "aaa", expireTime: "rrr", boughtTime: "eee"),
-    Chart(),
     Recipes(),
+    Charts(pageType: _pageType),
     Profile()
   ];
   int currentIndex = 0;
+  // String pageType = this.pageType;
 
   Future<String> onLoad() async {
     // var productName = "";
+    print("WHAT PAGE MAN");
+    print(_pageType);
     var collection = FirebaseFirestore.instance.collection('Food');
     var snapshot1 = collection.snapshots();
     var snapshot = await collection.get();
@@ -74,7 +92,12 @@ class _MainPageState extends State<Main> {
               offset: const Offset(0, 4))
         ]),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddItem()),
+            );
+          },
           child: Image.asset('lib/icons/plus.png',
               height: 27, width: 27, color: Colors.white),
           backgroundColor: Color(0xFF44ACA1),
