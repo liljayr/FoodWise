@@ -370,7 +370,7 @@ class _AddItemState extends State<AddItem> {
                             value: fruitVeggieCheckbox,
                             onChanged: (value) {
                               setState(() {
-                                fridgeCheckbox = !fridgeCheckbox;
+                                fruitVeggieCheckbox = !fruitVeggieCheckbox;
                               });
                             },
                           ),
@@ -381,7 +381,7 @@ class _AddItemState extends State<AddItem> {
                             value: meatCheckbox,
                             onChanged: (value) {
                               setState(() {
-                                freezeCheckbox = !freezeCheckbox;
+                                meatCheckbox = !meatCheckbox;
                               });
                             },
                           ),
@@ -392,7 +392,7 @@ class _AddItemState extends State<AddItem> {
                             value: dairyCheckbox,
                             onChanged: (value) {
                               setState(() {
-                                pantryCheckbox = !pantryCheckbox;
+                                dairyCheckbox = !dairyCheckbox;
                               });
                             },
                           ),
