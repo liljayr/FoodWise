@@ -8,17 +8,29 @@ import 'home_page.dart';
 import 'profile_page.dart';
 import 'recipe_page.dart';
 
-class Main extends StatefulWidget {
-  const Main({Key? key}) : super(key: key);
+late String _pageType = "";
 
+class Main extends StatefulWidget {
+  const Main({Key? key, required this.pageType}) : super(key: key);
+
+  final String pageType;
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class _MainPageState extends State<Main> {
+    @override
+  void initState() {
+    _pageType = widget.pageType;
+    print("PLEASE WORK PLEEEAAASSEEE");
+    print(_pageType);
+    super.initState();
+  }
+
+  var productName = "";
   List pages = [
     HomePage(),
-    Chart(),
+    Charts(pageType: _pageType),
     Recipes(),
     Profile(),
   ];
