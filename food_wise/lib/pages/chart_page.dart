@@ -34,8 +34,27 @@ class _ChartPageState extends State<Charts> {
   late List<charts.Series<Spending, String>> _seriesBarData;
   late List<Spending> mydata;
   late List<ChartData> wasteData;
-  bool _visible = true;
+  bool _visible = false;
+  bool wasteChart = false;
   int detailsChart = -1;
+
+  List<ChartData> foodWasteAvo = [];
+  //   ChartData("Veggies", 20, Color(0xFF1BA209)),
+  //   ChartData("Meat", 40, Color(0xFF832205)),
+  //   ChartData("Dairy", 40, Color(0xFF0B75D8))
+  // ];
+  List<ChartData> foodEatenAvo = [];
+  //   ChartData("Veggies", 90, Color(0xFF1BA209)),
+  //   ChartData("Meat", 5, Color(0xFF832205)),
+  //   ChartData("Dairy", 5, Color(0xFF0B75D8))
+  // ];
+  List<ChartData> foodLeftAvo = [];
+  //   ChartData("Veggies", 80, Color(0xFF1BA209)),
+  //   ChartData("Meat", 5, Color(0xFF832205)),
+  //   ChartData("Dairy", 15, Color(0xFF0B75D8))
+  // ];
+  List<ChartData> foodEatenLeftAvo = [];
+  String leftEatenStr = "";
 
   _generateData(mydata) {
     _seriesBarData = [];// List<charts.Series<Spending, String>>();
@@ -74,6 +93,48 @@ class _ChartPageState extends State<Charts> {
       ChartData('Eaten', 15, Color(0xFF44ACA1))
     ];
     super.initState();
+    onLoad();
+  }
+
+  Future<void> onLoad() async {
+    var collectionEaten = FirebaseFirestore.instance.collection('AvocadoEaten');
+    var snapshotEaten = await collectionEaten.get();
+    var dataListEaten = snapshotEaten.docs.toList();
+    foodEatenAvo = dataListEaten.map((e) => ChartData(e.get('category'),
+      e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
+      
+    var collectionFood = FirebaseFirestore.instance.collection('AvocadoFood');
+    var snapshotFood = await collectionFood.get();
+    var dataListFood = snapshotFood.docs.toList();
+    foodLeftAvo = dataListFood.map((e) => ChartData(e.get('category'),
+      e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
+      
+    var collectionWasted = FirebaseFirestore.instance.collection('AvocadoWasted');
+    var snapshotWasted = await collectionWasted.get();
+    var dataListWasted = snapshotWasted.docs.toList();
+    foodWasteAvo = dataListWasted.map((e) => ChartData(e.get('category'),
+      e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
+    // print("ONLOAD");
+    // snapshot.docs.map((e) {
+    //     print("Mapping e to get what it is");
+    //     print(e.data());
+    //     print(e['category']);
+    //   }
+    // );
+    // print("Did this work at all?");
+    // print(mapperThingy);
+    // print(dataList);
+    // print(dataList[0]['category']);
+    // print("done!");
+    // var data = snapshot.docs.first.data();
+    // if (data != null && data['name'] != null) {
+    //   setState(() {
+    //     this.productName = data['name'] as String;
+    //   });
+    // }
+    //this.productName = snapshot.docs.first.data()['name'] as String;
+    // print("product name:");
+    // print(this.productName);
   }
   
 
@@ -86,6 +147,8 @@ class _ChartPageState extends State<Charts> {
   }
 
   Widget _buildBody(BuildContext context) {
+    print("IS THEE PAGE KIND HERE");
+    print(widget.pageType);
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('AvocadoSpentTest').snapshots(),
       builder: (context, snapshot) {
@@ -127,10 +190,91 @@ class _ChartPageState extends State<Charts> {
   //   );
   // }
 
-  void setVisibility() {
+  void setVisibility(int pointIndex) {
     print("Changing visibility pleeease");
     setState(() {
-      _visible = !_visible;
+      if(!_visible){   // showing main chart, visible = false
+        print("change to show detailed chart");
+        if(pointIndex == 0){    // click on waste chart
+          print("Click on waste chart");
+          wasteChart = !wasteChart;   // wasteChart false -> true
+          detailsChart = pointIndex;  // set detailsChart -1 -> 0
+          _visible = !_visible;       // visible false -> true
+        }
+        else if(pointIndex == 1 || pointIndex == 2){    // click on left or eat chart
+          print("Click on left or eaten chart");
+          detailsChart = pointIndex;  // set detailsChart -1 -> 0
+          _visible = !_visible;       // visible false -> true
+          if(pointIndex == 1){
+            foodEatenLeftAvo = foodLeftAvo;
+            leftEatenStr = "Food Left";
+          }
+          else {
+            foodEatenLeftAvo = foodEatenAvo;
+            leftEatenStr = "Food Eaten";
+          }
+        }
+      }
+      else {    // Showing detailed chart already
+        print("Already showing detailed chart");
+        print(detailsChart);
+        print(pointIndex);
+        if(pointIndex == detailsChart){   // reclick on same part of chart
+          print("reclick on same chart part");
+          _visible = !_visible;
+          wasteChart = false;
+          detailsChart = -1;
+        }
+        else if(detailsChart == 0){   // clicking from waste chart
+          print("Clicking away from waste chart");
+          wasteChart = !wasteChart;
+          detailsChart = pointIndex;
+          print(wasteChart);
+          if(pointIndex == 1){
+            foodEatenLeftAvo = foodLeftAvo;
+            leftEatenStr = "Food Left";
+          }
+          else {
+            foodEatenLeftAvo = foodEatenAvo;
+            leftEatenStr = "Food Eaten";
+          }
+        }
+        else if(detailsChart == 1 || detailsChart == 2){  // clicking from left or eaten
+          if(pointIndex == 0){    // clicking to waste
+            print("going from left or eaten to waste");
+            wasteChart = !wasteChart;
+          }
+          print("going between left and eaten charts");
+          detailsChart = pointIndex;
+          if(pointIndex == 1){
+            foodEatenLeftAvo = foodLeftAvo;
+            leftEatenStr = "Food Left";
+          }
+          else {
+            foodEatenLeftAvo = foodEatenAvo;
+            leftEatenStr = "Food Eaten";
+          }
+        }
+      }
+      // if(detailsChart == pointIndex && !_visible){
+      //   print("Clicked on the same one");
+      //   _visible = !_visible;
+      //   print(_visible);
+      //   print(detailsChart);
+      // }
+      // else if(_visible){
+      //   print("first click");
+      //   detailsChart = pointIndex;
+      //   _visible = !_visible;
+      //   print(_visible);
+      //   print(detailsChart);
+      // }
+      // else{
+      //   print("only changing the details chart");
+      //   detailsChart = pointIndex;
+      //   print(_visible);
+      //   print(detailsChart);
+      // }
     });
   }
 
@@ -159,13 +303,7 @@ class _ChartPageState extends State<Charts> {
     print("akdjhfaksdjhfksdjhf");
     print(saledata[0].date.toDate().day);
     print(DateFormat('EEEE').format(saledata[0].date.toDate()));
-    // final List<Spending> chartData = saledata;
-    // <Spending>[
-    //    ChartData('Germany', 128, 129),
-    //    ChartData('Russia', 123, 92),
-    //    ChartData('Norway', 107, 106),
-    //    ChartData('USA', 87, 95),
-    // ];
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Center(
@@ -207,10 +345,10 @@ class _ChartPageState extends State<Charts> {
                             print("WTFFFF");
                             print("Point index");
                             print(details.pointIndex);
-                            detailsChart = details.pointIndex!;
+                            // detailsChart = details.pointIndex!;
                             print("series index");
                             print(details.seriesIndex);
-                            setVisibility();
+                            setVisibility(details.pointIndex as int);
                             // TextDis(context);
                             // setState(() {
                             //   _visible = !_visible;
@@ -232,20 +370,98 @@ class _ChartPageState extends State<Charts> {
                     )
                   // ),
                 ),
-                AnimatedOpacity(
-                  opacity: !_visible ? 1.0 : 0.0,
+                if(_visible) AnimatedOpacity(
+                  opacity: _visible ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 500),
                   child: Container(
                     child: Column(
                       children: [
-                        Text("AAAAAA")
+                        if(wasteChart) SfCartesianChart(
+                          primaryYAxis: NumericAxis(
+                            minimum: 0,
+                            maximum: 100
+                          ),
+                          title: ChartTitle(
+                            text: "AAAAA",
+                            alignment: ChartAlignment.near
+                          ),
+                          primaryXAxis: CategoryAxis(),
+                          legend: Legend(
+                            isVisible: true,
+                            position: LegendPosition.top
+                            ),
+                            series: <CartesianSeries>[
+                              ColumnSeries<ChartData, String>(
+                                dataSource: (foodWasteAvo),
+                                // onPointTap: (ChartPointDetails details) {
+                                //   print(details.pointIndex);
+                                //   print(details.seriesIndex);
+                                // },
+                                // selectionBehavior: SelectionBehavior(enable: true),
+                                // dataLabelSettings: DataLabelSettings(isVisible: true),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(5),
+                                  topRight: Radius.circular(5)
+                                ),
+                                xValueMapper: (ChartData data, _) => data.x,
+                                yValueMapper: (ChartData data, _) => data.y,
+                                color: Color(0xFFFF4121),
+                                name: "Percentage"
+                              ),
+                            ]
+                          ),
+                          if(!wasteChart) SfCircularChart(
+                            // title: ChartTitle(
+                            //   text: "Food usage"
+                            // ),
+                            legend: Legend(isVisible: true),
+                            // onChartTouchInteractionUp:(ChartTouchInteractionArgs args){
+                            //   print("AAAAAAAA am i touching this now???");
+                            //   // print(args);
+                            //   // print(args.position.dx.toString());
+                            //   // print(args.position.dy.toString());
+                            //   setVisibility();
+                            //   print(detailsChart);
+                            // },
+                            tooltipBehavior: TooltipBehavior(enable: true),
+                            series: <CircularSeries>[
+                              DoughnutSeries<ChartData, String>(
+                                dataSource: foodEatenLeftAvo,
+                                explode: true,
+                                onPointTap: (ChartPointDetails details) {
+                                  print("WTFFFF");
+                                  print("Point index");
+                                  print(details.pointIndex);
+                                  detailsChart = details.pointIndex!;
+                                  print("series index");
+                                  print(details.seriesIndex);
+                                  // setVisibility();
+                                  // TextDis(context);
+                                  // setState(() {
+                                  //   _visible = !_visible;
+                                  //   print("Changing visible");
+                                  //   print(_visible);
+                                  // });
+                                },
+                                selectionBehavior: SelectionBehavior(enable: true),
+                                pointColorMapper:(ChartData data,  _) => data.color,
+                                xValueMapper: (ChartData data, _) => data.x,
+                                yValueMapper: (ChartData data, _) => data.y,
+                                // name: ((ChartData data, _) => data.x) as String,
+                                dataLabelMapper: (ChartData data, _) => data.x,
+                                dataLabelSettings: DataLabelSettings(
+                                  isVisible: true
+                                )
+                              )
+                            ]
+                          )
                         // ChartDetails(pageType: "avocado",),
                       ],
                     ),
                   ),
                 ),
-                AnimatedOpacity(
-                  opacity: _visible ? 1.0 : 0.0,
+                if(!_visible) AnimatedOpacity(
+                  opacity: !_visible ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 500),
                   child: Column(
                     children: [
