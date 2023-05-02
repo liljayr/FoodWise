@@ -330,12 +330,16 @@ class _ChartPageState extends State<Charts> {
                 //   },
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15.0),
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 2.0
-                      )
-                    ),
+                      color: Color(0xFFFFFFFF),
+                      borderRadius: BorderRadius.circular(6),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFF828282).withOpacity(0.2),
+                          blurRadius: 23,
+                          spreadRadius: -4,
+                          offset: Offset(0, 4.0),
+                        ),
+                      ]),
                     child: SfCircularChart(
                       // title: ChartTitle(
                       //   text: "Food usage"
@@ -480,12 +484,16 @@ class _ChartPageState extends State<Charts> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.0),
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 2.0
-                          )
-                        ),
+                          color: Color(0xFFFFFFFF),
+                          borderRadius: BorderRadius.circular(6),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFF828282).withOpacity(0.2),
+                              blurRadius: 23,
+                              spreadRadius: -4,
+                              offset: Offset(0, 4.0),
+                            ),
+                          ]),
                         child: SfCartesianChart(
                           title: ChartTitle(
                             text: "Spending",
@@ -535,38 +543,73 @@ class _ChartPageState extends State<Charts> {
                           )
                         ),
                         Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Center(
                               child: Container(
-                                decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15.0),
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 2.0
-                                )
-                              ),
-                              child: Column(
+                              height: 87,
+                              width: 156,
+                              decoration: BoxDecoration(
+                                  color: Color(0xFFFFFFFF),
+                                  borderRadius: BorderRadius.circular(6),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xFF828282).withOpacity(0.2),
+                                      blurRadius: 23,
+                                      spreadRadius: -4,
+                                      offset: Offset(0, 4.0),
+                                    ),
+                                  ]),
+                              child: Row(
+                              children: [
+                                Icon(
+                                  Icons.water_drop,
+                                  color: Colors.blue,
+                                  size: 30.0,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text('Water Use'),
                                   Text('320 L'),   // 320 liters per avocado https://greenly.earth/en-us/blog/ecology-news/what-is-the-avocados-environmental-impact
                                 ],
+                              )]
                               )
                             ),
                           ),
                           Center(
                             child: Container(
+                              height: 87,
+                              width: 156,
                               decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15.0),
-                              border: Border.all(
-                                color: Colors.grey,
-                                width: 2.0
-                              )
-                            ),
-                              child: Column(
+                                  color: Color(0xFFFFFFFF),
+                                  borderRadius: BorderRadius.circular(6),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xFF828282).withOpacity(0.2),
+                                      blurRadius: 23,
+                                      spreadRadius: -4,
+                                      offset: Offset(0, 4.0),
+                                    ),
+                                  ]),
+                              child: Row(
+                              children: [
+                                Icon(
+                                  Icons.cloud,
+                                  color: Colors.black,
+                                  size: 30.0,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                 children:[
                                   Text('CO2 Emissions'),
                                   Text('425 g'),   // 850 g for 2 avocados https://8billiontrees.com/carbon-offsets-credits/carbon-ecological-footprint-calculators/carbon-footprint-of-avocado/#:~:text=The%20carbon%20footprint%20of%20two%20avocados%20is%20rated%20at%20850%20grams
                                 ]
+                              )
+                              ]
                               )
                             )
                           )
