@@ -501,7 +501,6 @@ class _AddItemState extends State<AddItem> {
                     ),
                   ),
                   Expanded(
-<<<<<<< HEAD
                     child: CheckboxListTile(
                       title: Text("Dairy",
                           style: TextStyle(
@@ -516,7 +515,6 @@ class _AddItemState extends State<AddItem> {
                         });
                       },
                     ),
-=======
                     child: Row(
                       children: [
                         Expanded(
@@ -554,7 +552,7 @@ class _AddItemState extends State<AddItem> {
                         )
                       ]
                     )
->>>>>>> d0aad701bf0d7ec43d9e8890ae28a806a0b7f16e
+
                   )
                 ]))
               ],
