@@ -1,162 +1,144 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-
-// Import the firebase_core plugin
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-//Import firestore database
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../firebase_options.dart';
-import 'package:meta/meta.dart';
 import 'package:intl/intl.dart';
 
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(MyApp());
+  @override
+  _HomePageState createState() => _HomePageState();
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'FoodWise',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      // home: FutureBuilder<QuerySnapshot>(
-      //   future: FirebaseFirestore.instance.collection('Food').get(),
-      //   builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-      //     if (snapshot.connectionState == ConnectionState.done) {
-      //       // if (snapshot.hasError) {
-      //       //   return Text('Error: ${snapshot.error}');
-      //       // } else {
-      //       //   var names = snapshot.data?.docs.map((doc) => doc['name'] as String).join(', ') ?? '';
-      //       //   final b_timestamp = snapshot.data?.docs.first['Bought'] as Timestamp;
-      //       //   final b_date = b_timestamp.toDate(); // Convert the timestamp to a DateTime object
-      //       //   final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(b_date); // Format the date as a string
-      //       //   final e_timestamp = snapshot.data?.docs.first['Expires'] as Timestamp;
-      //       //   final e_date = e_timestamp.toDate(); // Convert the timestamp to a DateTime object
-      //       //   final e_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(e_date); // Format the date as a string
-      //       //   return Home(key: ValueKey('my_home_page'), title: names, boughtTime: b_formattedDate, expireTime: e_formattedDate);
-      //       // }
-      //     } else {
-      //       return CircularProgressIndicator();
-      //     }
-      //   },
-      // ),
-    );
-  }
-}
+    CollectionReference foodCollection =
+        FirebaseFirestore.instance.collection('AvocadoFood');
 
-class Home extends StatefulWidget {
-  const Home({Key? key, required this.title, required this.boughtTime, required this.expireTime}) : super(key: key);
-
-  final String boughtTime;
-  final String expireTime;
-  final String title;
-
-  @override
-  _HState createState() => _HState();
-}
-
-class _HState extends State<Home> {
-  var productName = "";
-  var boughtTime = "";
-  var expireTime = "";
-
-  @override
-  void initState() {
-    super.initState();
-    onLoad();
-  }
-
-  Future<void> onLoad() async {
-    var collection = FirebaseFirestore.instance.collection('Food');
-    var snapshot1 = collection.snapshots();
-    var snapshot = await collection.get();
-    print("AAAAAAAA");
-    print(snapshot.docs.first.data());
-    print(snapshot.docs[0]);
-    var data = snapshot.docs.first.data();
-    if (data != null && data['name'] != null) {
-      setState(() {
-        this.productName = data['name'] as String;
-      });
-    }
-    //this.productName = snapshot.docs.first.data()['name'] as String;
-    print("product name:");
-    print(this.productName);
-    // if (snapshot1.isEmpty == ConnectionState.done) {
-    //   if (snapshot) {
-    //     Text('Error: ${snapshot.error}');
-    //   } else {
-    //     var names = snapshot.docs.data?.docs.map((doc) => doc['name'] as String).join(', ') ?? '';
-    //     final b_timestamp = snapshot.data?.docs.first['Bought'] as Timestamp;
-    //     final b_date = b_timestamp.toDate(); // Convert the timestamp to a DateTime object
-    //     final b_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(b_date); // Format the date as a string
-    //     final e_timestamp = snapshot.data?.docs.first['Expires'] as Timestamp;
-    //     final e_date = e_timestamp.toDate(); // Convert the timestamp to a DateTime object
-    //     final e_formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(e_date); // Format the date as a string
-    //     Home(key: ValueKey('my_home_page'), title: names, boughtTime: b_formattedDate, expireTime: e_formattedDate);
-    //   }
-    // }
-  }
-
-  
-  @override
-  Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-              'My Items',
-              style: TextStyle(fontSize: 25),
-            ),
+        backgroundColor: Color(0xFF44ACA1),
+        title: const Text('Home'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Item:',
-              style: TextStyle(fontSize: 25),
-            ),
-            SizedBox(height: 10),
-            Text(
-              this.productName,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'Bought Time:',
-              style: TextStyle(fontSize: 25),
-            ),
-            SizedBox(height: 10),
-            Text(
-              boughtTime,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'Expiration Time:',
-              style: TextStyle(fontSize: 25),
-            ),
-            SizedBox(height: 10),
-            Text(
-              expireTime,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            ElevatedButton(
-              child: const Text('Open route'),
-              onPressed: () {
-                onLoad();
+      body: StreamBuilder<QuerySnapshot>(
+        stream: foodCollection.snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Something went wrong');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Text('Loading...');
+          }
+
+          final data = snapshot.requireData;
+
+          return ListView.builder(
+            itemCount: data.size,
+            itemBuilder: (BuildContext context, int index) {
+              final doc = data.docs[index];
+              final name = doc['name'] as String;
+              final boughtDate = DateFormat('yyyy-MM-dd').format((doc['boughtDate'] as Timestamp).toDate());
+              final expiryDate = DateFormat('yyyy-MM-dd').format((doc['expirationDate'] as Timestamp).toDate());
+              final quantity = doc['quantity'] as int;
+              final storage = doc['storage'] as String;
+
+              String imageAssetPath;
+              if (name == 'mushrooms') {
+                imageAssetPath = 'lib/images/mushroom.png';
+              } else if (name == 'avocado') {
+                imageAssetPath = 'lib/images/avocado.png';
+              } else if (name == 'grapes') {
+                imageAssetPath = 'lib/images/grapes.png';
+              } else {
+                imageAssetPath = 'lib/images/avocado.png';
+              }
+
+              return Card(
+                elevation: 4, // add a box shadow
+                child: Container(
+                  padding: EdgeInsets.all(16), // add some padding
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        imageAssetPath,
+                        width: 64,
+                        height: 64,
+                      ),
+                      SizedBox(width: 16), // add some spacing
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('$name ($quantity)'),
+                          SizedBox(height: 8), // add some spacing
+                          Text('Storage place: $storage'),
+                          Text('Bought: $boughtDate'),
+                          Text('Expires: $expiryDate'),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
             },
-            )
-          ]
-          ),
-        )
+          );
+        },
+      ),
     );
   }
 }
+
+
+
+
+/*class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    CollectionReference foodCollection =
+        FirebaseFirestore.instance.collection('AvocadoFood');
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xFF44ACA1),
+        title: const Text('Home'),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: foodCollection.snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Something went wrong');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Text('Loading...');
+          }
+
+          final data = snapshot.requireData;
+
+          return ListView.builder(
+            itemCount: data.size,
+            itemBuilder: (BuildContext context, int index) {
+              final doc = data.docs[index];
+              final name = doc['name'] as String;
+              final boughtDate = DateFormat('yyyy-MM-dd').format((doc['boughtDate'] as Timestamp).toDate());
+              final expiryDate = DateFormat('yyyy-MM-dd').format((doc['expirationDate'] as Timestamp).toDate());
+
+              return ListTile(
+                title: Text(name),
+                subtitle: Text('Bought Date: $boughtDate\nExpiry Date: $expiryDate'),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}*/
