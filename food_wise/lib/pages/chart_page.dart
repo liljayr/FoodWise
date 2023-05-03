@@ -399,7 +399,7 @@ class _ChartPageState extends State<Charts> {
                             maximum: 100
                           ),
                           title: ChartTitle(
-                            text: "AAAAA",
+                            text: "Wasted Food Details",
                             alignment: ChartAlignment.near
                           ),
                           primaryXAxis: CategoryAxis(),

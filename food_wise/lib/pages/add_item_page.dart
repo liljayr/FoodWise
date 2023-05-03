@@ -156,7 +156,8 @@ class _AddItemState extends State<AddItem> {
             style: TextStyle(fontSize: 25),
           ),
         ),
-        body: Center(
+        body: SingleChildScrollView(
+          child: Center(
             child: Form(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
@@ -469,54 +470,6 @@ class _AddItemState extends State<AddItem> {
                 Expanded(
                     child: Row(children: [
                   Expanded(
-                    child: CheckboxListTile(
-                      title: Text("Fruit/Veggie",
-                          style: TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF343434),
-                              fontFamily: 'Montserat',
-                              fontWeight: FontWeight.w500)),
-                      value: fruitVeggieCheckbox,
-                      onChanged: (value) {
-                        setState(() {
-                          fridgeCheckbox = !fridgeCheckbox;
-                        });
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: CheckboxListTile(
-                      title: Text("Meat",
-                          style: TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF343434),
-                              fontFamily: 'Montserat',
-                              fontWeight: FontWeight.w500)),
-                      value: meatCheckbox,
-                      onChanged: (value) {
-                        setState(() {
-                          freezeCheckbox = !freezeCheckbox;
-                        });
-                      },
-                    ),
-                  ),
-                  Expanded(
-<<<<<<< HEAD
-                    child: CheckboxListTile(
-                      title: Text("Dairy",
-                          style: TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF343434),
-                              fontFamily: 'Montserat',
-                              fontWeight: FontWeight.w500)),
-                      value: dairyCheckbox,
-                      onChanged: (value) {
-                        setState(() {
-                          pantryCheckbox = !pantryCheckbox;
-                        });
-                      },
-                    ),
-=======
                     child: Row(
                       children: [
                         Expanded(
@@ -554,7 +507,6 @@ class _AddItemState extends State<AddItem> {
                         )
                       ]
                     )
->>>>>>> d0aad701bf0d7ec43d9e8890ae28a806a0b7f16e
                   )
                 ]))
               ],
@@ -657,6 +609,6 @@ class _AddItemState extends State<AddItem> {
               ),
             )
           ]),
-        )));
+        ))));
   }
 }

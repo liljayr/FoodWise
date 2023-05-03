@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../firebase_options.dart';
+import 'add_item_page.dart';
 import 'chart_page.dart';
 import 'home_page.dart';
 import 'profile_page.dart';
@@ -55,8 +56,13 @@ class _MainPageState extends State<Main> {
           ],
         ),
         child: FloatingActionButton(
-          onPressed: () {},
-          child: const Icon(Icons.qr_code_2_rounded),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddItem()),
+            );
+          },
+          child: const Icon(Icons.add),
           backgroundColor: Color(0xFF44ACA1),
         ),
       ),
