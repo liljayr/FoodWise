@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
@@ -372,4 +372,205 @@ class Profile extends StatelessWidget {
           ]),
     );
   }
+}*/
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+
+class News {
+  Future<List<dynamic>> fetchNews() async {
+    final response = await http.get(
+      Uri.parse(
+          'https://newsapi.org/v2/everything?q=eating&from=2023-04-03&sortBy=publishedAt&apiKey=c74d778b3ca6464db3fd68f48aa820ad'),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data != null && data.containsKey('articles')) {
+        return data['articles'];
+      } else {
+        throw Exception('Failed to load news');
+      }
+    } else {
+      throw Exception('Failed to load news');
+    }
+  }
 }
+
+class NewsScreen extends StatelessWidget {
+  final News news = News();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Food Related News'),
+      ),
+      body: FutureBuilder<List<dynamic>>(
+        future: news.fetchNews(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            final articles = snapshot.data!;
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final article in articles)
+                    if (article['urlToImage'] != null)
+                      GestureDetector(
+                        onTap: () async {
+                          if (await canLaunch(article['url'])) {
+                            await launch(article['url']);
+                          }
+                        },
+                        child: Container(
+                          width: 200,
+                          margin: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(16),
+                                  topRight: Radius.circular(16),
+                                ),
+                                child: Image.network(
+                                  article['urlToImage'],
+                                  width: 200,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  article['title'] ?? 'No title available',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                ],
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Text('${snapshot.error}');
+          }
+
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+
+
+
+void main() {
+  runApp(
+    MaterialApp(
+      title: 'Food Waste News',
+      home: NewsScreen(),
+    ),
+  );
+}
+
+
+
+///////////////////////////////////////////////////////
+
+
+
+
+/*import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class News {
+  Future<List<dynamic>> fetchNews() async {
+    final response = await http.get(
+      Uri.parse(
+          'https://newsdata.io/api/1/news?apikey=pub_215609999a88287de30211ec3a921ef71e432&q=food%20waste'),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data != null && data.containsKey('results')) {
+        return data['results'];
+      } else {
+        throw Exception('Failed to load news');
+      }
+    } else {
+      throw Exception('Failed to load news');
+    }
+  }
+}
+
+class NewsScreen extends StatelessWidget {
+  final News news = News();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Food Waste News'),
+      ),
+      body: FutureBuilder<List<dynamic>>(
+        future: news.fetchNews(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            final articles = snapshot.data!;
+            return ListView.builder(
+              itemCount: articles.length,
+              itemBuilder: (context, index) {
+                final article = articles[index];
+                return ListTile(
+                  title: Text(article['title'] ?? 'No title available'),
+                  subtitle: Text(article['description'] ?? 'No description available'),
+                );
+              },
+            );
+          } else if (snapshot.hasError) {
+            return Text('${snapshot.error}');
+          }
+
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+void main() {
+  runApp(
+    MaterialApp(
+      title: 'Food Waste News',
+      home: NewsScreen(),
+    ),
+  );
+}*/
