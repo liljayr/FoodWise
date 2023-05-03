@@ -501,7 +501,6 @@ class _AddItemState extends State<AddItem> {
                     ),
                   ),
                   Expanded(
-<<<<<<< HEAD
                     child: CheckboxListTile(
                       title: Text("Dairy",
                           style: TextStyle(
@@ -516,45 +515,6 @@ class _AddItemState extends State<AddItem> {
                         });
                       },
                     ),
-=======
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CheckboxListTile(
-                            title:Text("Fruit/Veggie"),
-                            value: fruitVeggieCheckbox,
-                            onChanged: (value) {
-                              setState(() {
-                                fruitVeggieCheckbox = !fruitVeggieCheckbox;
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: CheckboxListTile(
-                            title:Text("Meat"),
-                            value: meatCheckbox,
-                            onChanged: (value) {
-                              setState(() {
-                                meatCheckbox = !meatCheckbox;
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: CheckboxListTile(
-                            title:Text("Dairy"),
-                            value: dairyCheckbox,
-                            onChanged: (value) {
-                              setState(() {
-                                dairyCheckbox = !dairyCheckbox;
-                              });
-                            },
-                          ),
-                        )
-                      ]
-                    )
->>>>>>> d0aad701bf0d7ec43d9e8890ae28a806a0b7f16e
                   )
                 ]))
               ],
