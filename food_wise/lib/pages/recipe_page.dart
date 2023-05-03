@@ -52,7 +52,7 @@ Future<List<String>> loadProductName() async {
 
   Future<List<dynamic>> fetchRecipes(String productName) async {
     final response = await http.get(Uri.parse(
-        'https://api.spoonacular.com/recipes/findByIngredients?ingredients=$productName&number=20&apiKey=1d6bf23182464a8d9cd6c723cbe2095e'));
+        'https://api.spoonacular.com/recipes/findByIngredients?ingredients=$productName&number=10&apiKey=dbbb9edadfc9476689cb4a761355c59f'));
 
     if (response.statusCode == 200) {
       List<dynamic> recipes = json.decode(response.body);
@@ -70,7 +70,7 @@ Future<List<String>> loadProductName() async {
 
 Future<Map<String, dynamic>> fetchRecipe(int recipeId) async {
   final response = await http.get(Uri.parse(
-      'https://api.spoonacular.com/recipes/$recipeId/information?includeNutrition=true&apiKey=1d6bf23182464a8d9cd6c723cbe2095e'));
+      'https://api.spoonacular.com/recipes/$recipeId/information?includeNutrition=true&apiKey=dbbb9edadfc9476689cb4a761355c59f'));
 
   if (response.statusCode == 200) {
     Map<String, dynamic> recipeData = json.decode(response.body);
@@ -92,7 +92,7 @@ Future<Map<String, dynamic>> fetchRecipe(int recipeId) async {
 
     // Get recipe instructions
     final instructionResponse = await http.get(Uri.parse(
-        'https://api.spoonacular.com/recipes/$recipeId/analyzedInstructions?apiKey=1d6bf23182464a8d9cd6c723cbe2095e'));
+        'https://api.spoonacular.com/recipes/$recipeId/analyzedInstructions?apiKey=dbbb9edadfc9476689cb4a761355c59f'));
 
     if (instructionResponse.statusCode == 200) {
       List<dynamic> instructions = json.decode(instructionResponse.body);
@@ -120,6 +120,7 @@ void initState() {
 }
 
 
+
 @override
 Widget build(BuildContext context) {
   return FutureBuilder<List<dynamic>>(
@@ -129,16 +130,22 @@ Widget build(BuildContext context) {
         final recipes = snapshot.data!;
         return Column(
           children: [
-            Padding(
-                  padding: const EdgeInsets.only(right: 85, left: 10),
-                    child: Image.asset(
-                      'lib/images/logo.png',
-                      height: 23,
-                      width: 110,
-                    ),
+            Container(
+              height: 80,
+              color: Color(0xFF44ACA1),
+              child: Center(
+                child: Text(
+                  'Recipes',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
+              ),
+            ),
             SizedBox(
-              height: MediaQuery.of(context).size.height - 150,
+              height: MediaQuery.of(context).size.height - 230,
               child: ListView.builder(
                 itemCount: recipes.length,
                 itemBuilder: (context, index) {
