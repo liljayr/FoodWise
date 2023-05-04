@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Spending {
   final int waste;
   final int price;
-  final Timestamp date;
+  final String date;
   final Color colorP;
   final Color colorW;
 

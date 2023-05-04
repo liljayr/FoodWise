@@ -33,10 +33,18 @@ class ChartData {
 class _ChartPageState extends State<Charts> {
   late List<charts.Series<Spending, String>> _seriesBarData;
   late List<Spending> mydata;
-  late List<ChartData> wasteData;
+  late List<ChartData> wasteData = [];
+  late List<Spending> spentData;
+  late List<Spending> spendingData;
   bool _visible = false;
   bool wasteChart = false;
   int detailsChart = -1;
+  late int co2TotalEmission = 0;
+  late int h2oTotalEmission = 0;
+  late int numItems = 0;
+  int totalWaste = 0;
+  int totalEaten = 0;
+  int totalLeft = 0;
 
   List<ChartData> foodWasteAvo = [];
   //   ChartData("Veggies", 20, Color(0xFF1BA209)),
@@ -87,67 +95,88 @@ class _ChartPageState extends State<Charts> {
 
   @override
   void initState() {
-    wasteData = [
-      ChartData('Wasted', 25, Color(0xFFFF4121)),
-      ChartData('Left', 60, Color(0xFFF7B24A)),
-      ChartData('Eaten', 15, Color(0xFF44ACA1))
-    ];
+    // wasteData = [
+    //   ChartData('Wasted', 25, Color(0xFFFF4121)),
+    //   ChartData('Left', 60, Color(0xFFF7B24A)),
+    //   ChartData('Eaten', 15, Color(0xFF44ACA1))
+    // ];
     super.initState();
-    onLoad();
+    // onLoad();
   }
 
-  Future<void> onLoad() async {
-    var collectionEaten = FirebaseFirestore.instance.collection('AvocadoEaten');
+  Future<int> Emissions(String polluter, String product) async{
+    var collection = FirebaseFirestore.instance.collection('Avocado$polluter');
+    var snapshot = await collection.get();
+    var emission = snapshot.docs.where((element) => element['product'] == product).first['Emission'];
+    // print("YAYAYAYAYAY$emission");
+    return emission;
+  }
+
+  Future<int> loadList( String database, List<ChartData> finalList, int singleItemCount) async{
+    var collectionEaten = FirebaseFirestore.instance.collection(database);
     var snapshotEaten = await collectionEaten.get();
-    var dataListEaten = snapshotEaten.docs.toList();
-    foodEatenAvo = dataListEaten.map((e) => ChartData(e.get('category'),
-      e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
-
-    print("Get left food");
-      
-    var collectionFood = FirebaseFirestore.instance.collection('AvocadoFood');
-    var snapshotFood = await collectionFood.get();
-    var dataListFood = snapshotFood.docs.toList();
-    print("about to go");
-    print(dataListFood);
-    for(var i = 0; i < dataListFood.length; i++){
-      print(dataListFood[i]);
-      print("aaaaaaa");
-      print(dataListFood[i]['quantity']);
+    var dataList = snapshotEaten.docs.toList();
+    for(int i=0; i<dataList.length; i++){
+      var co2Emission = await Emissions('CO2', dataList[i]['name']);
+      var h2oEmission = await Emissions('H2O', dataList[i]['name']);
+      // print('$database $numItems');
+      // print("AAAAA");
+      // print(dataList[i]['category']);
+      var new_data = ChartData(dataList[i]['category'], dataList[i]['quantity'], Color(int.parse(dataList[i]['color'])));
+      finalList.add(new_data);
+      co2TotalEmission = co2TotalEmission + co2Emission*dataList[i]['quantity'] as int;
+      h2oTotalEmission = h2oTotalEmission + h2oEmission*dataList[i]['quantity'] as int;
+      // print("YESSSSS");
+      // print(co2TotalEmission);
+      numItems = numItems + dataList[i]['quantity']*dataList[i]['price'] as int;
+      singleItemCount = singleItemCount + dataList[i]['quantity']*dataList[i]['price'] as int;
+      // print(co2TotalEmission/numItems);
     }
-    print("is this right");
-    foodLeftAvo = dataListFood.map((e) => ChartData(e.get('category'),
-      e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
+    return singleItemCount;
+  }
 
-    print("is this ruight????????");
-    print(foodLeftAvo);
+  Future<List<Spending>> onLoad() async {
+    // co2TotalEmission = 0;
+    // h2oTotalEmission = 0;
+    // numItems = 0;
+
+    var collectionSpent = FirebaseFirestore.instance.collection('AvocadoSpentTest');
+    var snapshotSpent = await collectionSpent.get();
+    var dataListSpent = snapshotSpent.docs.toList();
+    spendingData = dataListSpent.map((e) => Spending(e.get('waste'),
+      e.get('price'), e.get('date'), ChangeColor(e.get('price'), "price"),
+      ChangeColor(e.get('price'), "price"))).toList();
+    
+    totalEaten = await loadList("AvocadoEaten", foodEatenAvo, totalEaten);
+    print("Did this work? eaten????");
+    print(foodEatenAvo.length);
+
+    // print("Get left food");
+
+    totalLeft = await loadList('AvocadoFood', foodLeftAvo, totalLeft);
+    print("Did this work? food????");
+    print(foodLeftAvo.length);
       
-    var collectionWasted = FirebaseFirestore.instance.collection('AvocadoWasted');
-    var snapshotWasted = await collectionWasted.get();
-    var dataListWasted = snapshotWasted.docs.toList();
-    foodWasteAvo = dataListWasted.map((e) => ChartData(e.get('category'),
-      e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
-    // print("ONLOAD");
-    // snapshot.docs.map((e) {
-    //     print("Mapping e to get what it is");
-    //     print(e.data());
-    //     print(e['category']);
-    //   }
-    // );
-    // print("Did this work at all?");
-    // print(mapperThingy);
-    // print(dataList);
-    // print(dataList[0]['category']);
-    // print("done!");
-    // var data = snapshot.docs.first.data();
-    // if (data != null && data['name'] != null) {
-    //   setState(() {
-    //     this.productName = data['name'] as String;
-    //   });
-    // }
-    //this.productName = snapshot.docs.first.data()['name'] as String;
-    // print("product name:");
-    // print(this.productName);
+    totalWaste = await loadList('AvocadoWasted', foodWasteAvo, totalWaste);
+    print("Did this work? waste????");
+    print(foodWasteAvo.length);
+
+    print("Is the total correct $numItems items, $totalLeft left, $totalEaten eaten, $totalWaste");
+    print("Emissions $co2TotalEmission co2, $h2oTotalEmission h2o");
+
+    co2TotalEmission = (co2TotalEmission/numItems).round();
+    h2oTotalEmission = (h2oTotalEmission/numItems).round();
+    print("Is the total correct $numItems items, $totalLeft left, $totalEaten eaten, $totalWaste");
+    print("Emissions $co2TotalEmission co2, $h2oTotalEmission h2o");
+
+    wasteData = [
+      ChartData('Wasted', (totalWaste/numItems)*100, Color(0xFFFF4121)),
+      ChartData('Left', (totalLeft/numItems)*100, Color(0xFFF7B24A)),
+      ChartData('Eaten', (totalEaten/numItems)*100, Color(0xFF44ACA1))
+    ];
+    print("Waste data has items!");
+    print(wasteData.length);
+    return spendingData;
   }
   
 
@@ -159,33 +188,77 @@ class _ChartPageState extends State<Charts> {
     );
   }
 
-  Widget _buildBody(BuildContext context) {
-    print("IS THEE PAGE KIND HERE");
-    print(widget.pageType);
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('AvocadoSpentTest').snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return LinearProgressIndicator();
-        } else {
-          List<Spending> sales = snapshot.data?.docs
-              .map((documentSnapshot) => Spending(
-                documentSnapshot.get('waste'),
-                documentSnapshot.get('price'),
-                documentSnapshot.get('date'),
-                ChangeColor(documentSnapshot.get('price'), "price"),
-                ChangeColor(documentSnapshot.get('price'), "waste")))
-              //Spending.fromMap(date, documentSnapshot.get('date')))
-              .toList() as List<Spending>;
-          print("JKASHDFKJSHF");
-          print(sales);
-          return _buildChart(context, sales);
+  Widget _buildBody(BuildContext context){
+    var done = onLoad();
+    return FutureBuilder<List<Spending>>(
+      future: onLoad(),
+      builder: (context, snapshot){
+        if(snapshot.hasData){
+          return _buildChart(context);
         }
+        return Center(
+          child: CircularProgressIndicator()
+        );
       },
     );
+    // return Scaffold(
+    //   body: done == true//!wasteData.isEmpty
+    //   ? Text('data')//_buildChart(context, spentData)
+    //   : Center(
+    //           child: CircularProgressIndicator(),
+    //         )
+    // );
+    // (!wasteData.isEmpty && )
+    // _buildChart(context, spentData);
   }
-  // Widget _buildChart(BuildContext context, List<Spending> saledata) {
-  //   mydata = saledata;
+
+  // Widget _buildBody(BuildContext context) {
+  //   print("IS THEE PAGE KIND HERE");
+  //   print(widget.pageType);
+  //   return MaterialApp(
+  //     debugShowCheckedModeBanner: false,
+  //     title: 'My App',
+  //     theme: ThemeData(
+  //       colorScheme: ColorScheme.fromSwatch().copyWith(
+  //         primary: const  Color(0xFF44ACA1)),
+  //     ),
+  //     home: FutureBuilder<QuerySnapshot>(
+  //     future: FirebaseFirestore.instance.collection('AvocadoSpentTest').get(),
+  //     builder: (context, snapshot) {
+  //       // if(!wasteData.isEmpty){
+  //         print("Should load");
+  //         var wasteBool = wasteData.isEmpty;
+  //         print("waste data is not empty $wasteBool");
+  //         if (!snapshot.hasData) {
+  //           return LinearProgressIndicator();
+  //         } else {
+  //           List<Spending> sales = snapshot.data?.docs
+  //               .map((documentSnapshot) => Spending(
+  //                 documentSnapshot.get('waste'),
+  //                 documentSnapshot.get('price'),
+  //                 documentSnapshot.get('date'),
+  //                 ChangeColor(documentSnapshot.get('price'), "price"),
+  //                 ChangeColor(documentSnapshot.get('price'), "waste")))
+  //               //Spending.fromMap(date, documentSnapshot.get('date')))
+  //               .toList() as List<Spending>;
+  //           print("JKASHDFKJSHF");
+  //           print(sales);
+  //           return _buildChart(context, sales);
+  //         }
+  //       // }
+  //       // else{
+  //       //   print("Endless loop");
+  //       //   print(wasteData.isEmpty);
+  //       //   onLoad();
+  //       //   return CircularProgressIndicator();
+  //       // }
+  //     },
+  //   )
+  //   );
+  // }
+
+  // Widget _buildChart(BuildContext context, List<Spending> spendingData) {
+  //   mydata = spendingData;
   //   _generateData(mydata);
   //   return Scaffold(
   //     // appBar: AppBar(
@@ -311,11 +384,11 @@ class _ChartPageState extends State<Charts> {
 
 
   @override
-  Widget _buildChart(BuildContext context, List<Spending> saledata) {
+  Widget _buildChart(BuildContext context) {
     // bool _visible = true;
-    print("akdjhfaksdjhfksdjhf");
-    print(saledata[0].date.toDate().day);
-    print(DateFormat('EEEE').format(saledata[0].date.toDate()));
+    // print("akdjhfaksdjhfksdjhf");
+    // print(spendingData[0].date.toDate().day);
+    // print(DateFormat('EEEE').format(spendingData[0].date.toDate()));
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -506,7 +579,7 @@ class _ChartPageState extends State<Charts> {
                             ),
                             series: <CartesianSeries>[
                               ColumnSeries<Spending, String>(
-                                dataSource: saledata,
+                                dataSource: spendingData,
                                 // onPointTap: (ChartPointDetails details) {
                                 //   print(details.pointIndex);
                                 //   print(details.seriesIndex);
@@ -517,13 +590,13 @@ class _ChartPageState extends State<Charts> {
                                   topLeft: Radius.circular(5),
                                   topRight: Radius.circular(5)
                                 ),
-                                xValueMapper: (Spending data, _) => DateFormat('EEEE').format(data.date.toDate()),
+                                xValueMapper: (Spending data, _) => data.date,
                                 yValueMapper: (Spending data, _) => data.price,
                                 color: Color(0xFF44ACA1),
                                 name: "Money Spent"
                               ),
                               ColumnSeries<Spending, String>(
-                                dataSource: saledata,
+                                dataSource: spendingData,
                                 // onPointTap: (ChartPointDetails details) {
                                 //   print(details.pointIndex);
                                 //   print(details.seriesIndex);
@@ -534,7 +607,7 @@ class _ChartPageState extends State<Charts> {
                                   topLeft: Radius.circular(5),
                                   topRight: Radius.circular(5)
                                 ),
-                                xValueMapper: (Spending data, _) => DateFormat('EEEE').format(data.date.toDate()),
+                                xValueMapper: (Spending data, _) => data.date,
                                 yValueMapper: (Spending data, _) => data.waste,
                                 color: Color(0xFFF7B24A),
                                 name: "Money Wasted"
@@ -692,8 +765,8 @@ class _ChartPageState extends State<Charts> {
 //       },
 //     );
 //   }
-//   Widget _buildChart(BuildContext context, List<Spending> saledata) {
-//     mydata = saledata;
+//   Widget _buildChart(BuildContext context, List<Spending> spendingData) {
+//     mydata = spendingData;
 //     _generateData(mydata);
 //     return AspectRatio(
 //       aspectRatio: 2,

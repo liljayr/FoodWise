@@ -125,8 +125,8 @@ class _ChartDetailPageState extends State<ChartDetails> {
   @override
   Widget _buildChart(BuildContext context, List<Spending> saledata) {
     print("akdjhfaksdjhfksdjhf");
-    print(saledata[0].date.toDate().day);
-    print(DateFormat('EEEE').format(saledata[0].date.toDate()));
+    // print(saledata[0].date.toDate().day);
+    // print(DateFormat('EEEE').format(saledata[0].date.toDate()));
     // final List<Spending> chartData = saledata;
     // <Spending>[
     //    ChartData('Germany', 128, 129),
@@ -167,7 +167,7 @@ class _ChartDetailPageState extends State<ChartDetails> {
                   topLeft: Radius.circular(5),
                   topRight: Radius.circular(5)
                 ),
-                xValueMapper: (Spending data, _) => DateFormat('EEEE').format(data.date.toDate()),
+                xValueMapper: (Spending data, _) => data.date,
                 yValueMapper: (Spending data, _) => data.price,
                 color: Color(0xFF44ACA1),
                 name: "Money Spent"
@@ -184,7 +184,7 @@ class _ChartDetailPageState extends State<ChartDetails> {
                   topLeft: Radius.circular(5),
                   topRight: Radius.circular(5)
                 ),
-                xValueMapper: (Spending data, _) => DateFormat('EEEE').format(data.date.toDate()),
+                xValueMapper: (Spending data, _) => data.date,
                 yValueMapper: (Spending data, _) => data.waste,
                 color: Color(0xFFF7B24A),
                 name: "Money Wasted"
