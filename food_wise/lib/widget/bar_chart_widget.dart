@@ -1,4 +1,4 @@
-import 'package:fl_chart/fl_chart.dart';
+/*import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import 'package:food_wise/model/spending.dart';
@@ -95,4 +95,4 @@ class _BarChartWidgetState extends State<BarChartWidget> {
       return Text(text);
     },
   );
-}
+}*/
