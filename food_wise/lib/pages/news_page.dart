@@ -378,6 +378,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+
 class News {
   Future<List<dynamic>> fetchNews() async {
     final response = await http.get(
@@ -404,62 +409,51 @@ class NewsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /*appBar: AppBar(
-        title: Text('Food Related News'),
-      ),*/
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             margin: EdgeInsets.only(left: 39, top: 38),
             child: Row(
-                //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 83),
-                    child: Image.asset(
-                      'lib/images/logo.png',
-                      height: 23,
-                      width: 110,
-                    ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 83),
+                  child: Image.asset(
+                    'lib/images/logo.png',
+                    height: 23,
+                    width: 110,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 15),
-                    child: Image.asset(
-                      'lib/images/notification.png',
-                      height: 52,
-                      width: 52,
-                    ),
-                  ),
-                  Image.asset(
-                    'lib/images/profile.png',
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 15),
+                  child: Image.asset(
+                    'lib/images/notification.png',
                     height: 52,
                     width: 52,
                   ),
-                ]),
+                ),
+                Image.asset(
+                  'lib/images/profile.png',
+                  height: 52,
+                  width: 52,
+                ),
+              ],
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 39, top: 30),
-            child: Text('Read more',
-                style: TextStyle(
-                    fontSize: 24,
-                    color: Color(0xFF4E4E4E),
-                    fontFamily: 'Montserat',
-                    fontWeight: FontWeight.w900)),
+            child: Text(
+              'Read more',
+              style: TextStyle(
+                  fontSize: 24,
+                  color: Color(0xFF4E4E4E),
+                  fontFamily: 'Montserat',
+                  fontWeight: FontWeight.w900),
+            ),
           ),
           SizedBox(
             height: 21,
           ),
-          /*Padding(
-            padding: const EdgeInsets.only(left: 39),
-            child: Text('Articles you may find helpful',
-                style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF4E4E4E),
-                    fontFamily: 'Montserat',
-                    fontWeight: FontWeight.w700)),
-          ),*/
-
           Padding(
             padding: const EdgeInsets.only(left: 39),
             child: FutureBuilder<List<dynamic>>(
@@ -488,8 +482,8 @@ class NewsScreen extends StatelessWidget {
                                     color: Colors.white,
                                     boxShadow: [
                                       BoxShadow(
-                                        color:
-                                            Color(0xFF929292).withOpacity(0.2),
+                                        color: Color(0xFF929292)
+                                            .withOpacity(0.2),
                                         blurRadius: 23,
                                         spreadRadius: -4,
                                         offset: Offset(0, 4.0),
@@ -508,6 +502,7 @@ class NewsScreen extends StatelessWidget {
                                         width: 200,
                                         height: 150,
                                         fit: BoxFit.cover,
+
                                       ),
                                     ),
                                     Padding(
