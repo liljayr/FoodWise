@@ -9,62 +9,125 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class ChartData {
-        ChartData(this.x, this.y, this.color);
-        final String x;
-        double? y;
-        final Color color;
+class SpentData {
+        SpentData(this.date, this.price, this.waste);
+        final String date;
+        double? price;
+        double? waste;
         // final double? y2;
       }
 
 class _HomePageState extends State<HomePage> {
 
-  // Future<void> Waste(id, productName, boughtDate, category, expirationDate, price, quantity, unit, color) async{
-  //   // Add in data to wasted database
-  //   var collectionWaste = FirebaseFirestore.instance.collection("AvocadoWasted");
-  //   var snapshotWaste = await collectionWaste.get();
-  //   var newindex = int.parse(snapshotWaste.docs.last.id) + 1;
-
-  //   Map<String, dynamic> newData = {
-  //     "name": productName,
-  //     "boughtDate": boughtDate,
-  //     "category": category,
-  //     "expirationDate": expirationDate,
-  //     "price": price,
-  //     "quantity": quantity,
-  //     "unit": unit,
-  //     "color": color
-  //   };
-  //   await collectionWaste.doc('$newindex').set(newData);
-
-  //   // Delete from food database
-  //   var collectionFood = FirebaseFirestore.instance.collection("AvocadoFood").doc(id);
-  //   await collectionFood.delete();
-  //   print("DONE!");
-  // }
-
   void Delete(id, productName, boughtDate, category, expirationDate, price, quantity, unit, color, newDB) async{
-    // Add in data to wasted database
-    var collectionWaste = FirebaseFirestore.instance.collection("$newDB");
-    var snapshotWaste = await collectionWaste.get();
-    var newindex = int.parse(snapshotWaste.docs.last.id) + 1;
+    // Add price to database
+    DateTime today = DateTime.now();
+    var month = new DateFormat.MMMM().format(today);
+    var collectionSpent = FirebaseFirestore.instance.collection("AvocadoSpentTest");
+    // TODO add try and get here in case date doesn't exist
+    try{
+      var snapshotSpent = await collectionSpent.where('date', isEqualTo: month).get();
 
-    Map<String, dynamic> newData = {
-      "name": productName,
-      "boughtDate": boughtDate,
-      "category": category,
-      "expirationDate": expirationDate,
-      "price": price,
-      "quantity": quantity,
-      "unit": unit,
-      "color": color
-    };
-    await collectionWaste.doc('$newindex').set(newData);
+      // print("IS THIS RIGHT??????");
+      // print(snapshotSpent.docs.first.get('date'));
+      // print(snapshotSpent.docs.last.get('date'));
+      if(newDB == "AvocadoEaten"){
+        var new_price = snapshotSpent.docs.first.get('price') + price;
 
-    // Delete from food database
-    var collectionFood = FirebaseFirestore.instance.collection("AvocadoFood").doc(id);
-    await collectionFood.delete();
-    print("DONE!");}
+        Map<String, dynamic> spentData = {
+          "date": snapshotSpent.docs.first.get('date'),
+          "price": new_price,
+          "waste": snapshotSpent.docs.first.get('waste'),
+        };
+        var oldId = snapshotSpent.docs.first.id;
+
+        collectionSpent.doc(oldId).set(spentData);
+      }
+      else if(newDB == "AvocadoWasted"){
+        print("WASTE");
+        var new_waste = snapshotSpent.docs.first.get('waste') + price;
+        print(new_waste);
+        Map<String, dynamic> spentData = {
+          "date": snapshotSpent.docs.first.get('date'),
+          "price": snapshotSpent.docs.first.get('price'),
+          "waste": new_waste,
+        };
+        var oldId = snapshotSpent.docs.first.id;
+
+        collectionSpent.doc(oldId).set(spentData);
+      }
+    }
+    catch(e){
+      print("month does not exist");
+      var snapshotSpent = await collectionSpent.get();
+      var new_index = int.parse(snapshotSpent.docs.last.id) + 1;
+      if(newDB == "AvocadoEaten"){
+        Map<String, dynamic> spentData = {
+          "date": month,
+          "price": price,
+          "waste": 0,
+        };
+
+        collectionSpent.doc('$new_index').set(spentData);
+      }
+      else if(newDB == "AvocadoWasted"){
+        print("WASTE");
+        Map<String, dynamic> spentData = {
+          "date": month,
+          "price": 0,
+          "waste": price,
+        };
+
+        collectionSpent.doc('$new_index').set(spentData);
+      }
+    }
+
+
+    // var list = snapshotSpent.docs.toList();
+    // List<SpentData> spentList = snapshotSpent.docs.map((e) => SpentData(e.get('date'), e.get('price'), e.get('waste'))).toList();
+    // var spentIndex = int.parse(snapshotSpent.docs.last.id) + 1;
+    // try{
+    //   var spentExist = spentList.where((element) => element.date==month);
+    //   print("FOUND in DB");
+    //   if(newDB == "AvocadoEaten"){
+    //     spentExist
+    //   }
+    // }
+    // if(spentList.any((element) => element.))
+
+
+
+    // if(newDB == "AvocadoEaten"){
+    //   Map<String, dynamic> spentData = {
+    //     "date": productName,
+    //     "price": price,
+    //     "waste": quantity,
+    //   };
+    // }
+
+
+
+      // Add in data to wasted database
+      var collectionWaste = FirebaseFirestore.instance.collection("$newDB");
+      var snapshotWaste = await collectionWaste.get();
+      var newindex = int.parse(snapshotWaste.docs.last.id) + 1;
+      Map<String, dynamic> newData = {
+        "name": productName,
+        "boughtDate": boughtDate,
+        "category": category,
+        "expirationDate": expirationDate,
+        "price": price,
+        "quantity": quantity,
+        "unit": unit,
+        "color": color
+      };
+      await collectionWaste.doc('$newindex').set(newData);
+
+      // Delete from food database
+      var collectionFood = FirebaseFirestore.instance.collection("AvocadoFood").doc(id);
+      await collectionFood.delete();
+      print("DONE!");
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +212,14 @@ class _HomePageState extends State<HomePage> {
                   shrinkWrap: true,
                   itemCount: data.size,
                   itemBuilder: (BuildContext context, int index) {
+                    // DateTime today2 = DateTime.now();
+                    // var month = new DateFormat.MMMM().format(today2);
+                    // print("MONTHTHTHTHHTHTH");
+                    // print(month);
+                    // var snapshot2 = foodCollection.where('date', isEqualTo: month).get();
+                    // print(snapshot2);
+                    // print(foodCollection.where('date', isEqualTo: month).get());
+                    // var sp = foodCollection.get();
                     final doc = data.docs[index];
                     final id = doc.id;
                     final name = doc['name'] as String;
