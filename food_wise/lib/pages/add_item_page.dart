@@ -470,43 +470,52 @@ class _AddItemState extends State<AddItem> {
                 Expanded(
                     child: Row(children: [
                   Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CheckboxListTile(
-                            title:Text("Fruit/Veggie"),
-                            value: fruitVeggieCheckbox,
-                            onChanged: (value) {
-                              setState(() {
-                                fruitVeggieCheckbox = !fruitVeggieCheckbox;
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: CheckboxListTile(
-                            title:Text("Meat"),
-                            value: meatCheckbox,
-                            onChanged: (value) {
-                              setState(() {
-                                meatCheckbox = !meatCheckbox;
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: CheckboxListTile(
-                            title:Text("Dairy"),
-                            value: dairyCheckbox,
-                            onChanged: (value) {
-                              setState(() {
-                                dairyCheckbox = !dairyCheckbox;
-                              });
-                            },
-                          ),
-                        )
-                      ]
-                    )
+                    child: CheckboxListTile(
+                      title: Text("Fruit/Veggie",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                      value: fruitVeggieCheckbox,
+                      onChanged: (value) {
+                        setState(() {
+                          fridgeCheckbox = !fridgeCheckbox;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: CheckboxListTile(
+                      title: Text("Meat",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                      value: meatCheckbox,
+                      onChanged: (value) {
+                        setState(() {
+                          freezeCheckbox = !freezeCheckbox;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: CheckboxListTile(
+                      title: Text("Dairy",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF343434),
+                              fontFamily: 'Montserat',
+                              fontWeight: FontWeight.w500)),
+                      value: dairyCheckbox,
+                      onChanged: (value) {
+                        setState(() {
+                          pantryCheckbox = !pantryCheckbox;
+                        });
+                      },
+                    ),
                   )
                 ]))
               ],
