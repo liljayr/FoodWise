@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+/*import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_chart_json/Sales.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
@@ -197,4 +197,4 @@ class _ChartDetailPageState extends State<ChartDetails> {
   }
 
      
-}
+}*/

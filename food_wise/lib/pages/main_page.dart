@@ -101,11 +101,11 @@ class _MainPageState extends State<Main> {
                 icon: Image.asset('lib/icons/home.png', height: 24, width: 28),
                 label: "Home"),
             BottomNavigationBarItem(
-                icon: Image.asset('lib/icons/recipes.png',
+                icon: Image.asset('lib/icons/stats.png',
                     height: 26.2, width: 17.3),
                 label: "Charts"),
             BottomNavigationBarItem(
-                icon: Image.asset('lib/icons/stats.png', height: 25, width: 27),
+                icon: Image.asset('lib/icons/recipes.png', height: 25, width: 27),
                 label: "Recipes"),
             BottomNavigationBarItem(
                 icon: Image.asset('lib/icons/insights.png',

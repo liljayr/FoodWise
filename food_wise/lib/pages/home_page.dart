@@ -16,76 +16,251 @@ class _HomePageState extends State<HomePage> {
         FirebaseFirestore.instance.collection('AvocadoFood');
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFF44ACA1),
-        title: const Text('Home'),
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: foodCollection.snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return const Text('Something went wrong');
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text('Loading...');
-          }
-
-          final data = snapshot.requireData;
-
-          return ListView.builder(
-            itemCount: data.size,
-            itemBuilder: (BuildContext context, int index) {
-              final doc = data.docs[index];
-              final name = doc['name'] as String;
-              final boughtDate = DateFormat('yyyy-MM-dd').format((doc['boughtDate'] as Timestamp).toDate());
-              final expiryDate = DateFormat('yyyy-MM-dd').format((doc['expirationDate'] as Timestamp).toDate());
-              final quantity = doc['quantity'] as int;
-              final storage = doc['storage'] as String;
-
-              String imageAssetPath;
-              if (name == 'mushrooms') {
-                imageAssetPath = 'lib/images/mushroom.png';
-              } else if (name == 'avocado') {
-                imageAssetPath = 'lib/images/avocado.png';
-              } else if (name == 'grapes') {
-                imageAssetPath = 'lib/images/grapes.png';
-              } else {
-                imageAssetPath = 'lib/images/avocado.png';
-              }
-
-              return Card(
-                elevation: 4, // add a box shadow
-                child: Container(
-                  padding: EdgeInsets.all(16), // add some padding
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        imageAssetPath,
-                        width: 64,
-                        height: 64,
-                      ),
-                      SizedBox(width: 16), // add some spacing
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('$name ($quantity)'),
-                          SizedBox(height: 8), // add some spacing
-                          Text('Storage place: $storage'),
-                          Text('Bought: $boughtDate'),
-                          Text('Expires: $expiryDate'),
-                        ],
-                      ),
-                    ],
-                  ),
+        /* appBar: AppBar(
+          backgroundColor: Color(0xFF44ACA1),
+          title: const Text('Home'),
+        ),*/
+        backgroundColor: Color(0xFFFFFFFF),
+        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            margin: EdgeInsets.only(left: 39, top: 38),
+            child: Row(children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 83),
+                child: Image.asset(
+                  'lib/images/logo.png',
+                  height: 23,
+                  width: 110,
                 ),
-              );
-            },
-          );
-        },
-      ),
-    );
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: Image.asset(
+                  'lib/images/notification.png',
+                  height: 52,
+                  width: 52,
+                ),
+              ),
+              Image.asset(
+                'lib/images/profile.png',
+                height: 52,
+                width: 52,
+              ),
+            ]),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 39, top: 30),
+            child: Text('Your inventory',
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Color(0xFF4E4E4E),
+                    fontFamily: 'Montserat',
+                    fontWeight: FontWeight.w900)),
+          ),
+          SizedBox(
+            height: 21,
+          ),
+          /*Padding(
+            padding: const EdgeInsets.only(left: 39),
+            child: Text("Your inventory",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF4E4E4E),
+                    fontFamily: 'Montserat',
+                    fontWeight: FontWeight.w700)),
+          ),
+          SizedBox(
+            height: 25,
+          ),*/
+          Container(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: foodCollection.snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  return const Text('Something went wrong');
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Text('Loading...');
+                }
+
+                final data = snapshot.requireData;
+
+                return ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: data.size,
+                  itemBuilder: (BuildContext context, int index) {
+                    final doc = data.docs[index];
+                    final name = doc['name'] as String;
+                    final boughtDate = DateFormat('yyyy-MM-dd')
+                        .format((doc['boughtDate'] as Timestamp).toDate());
+                    var today = new Timestamp.now();
+                    var todayDate = DateTime.parse(today.toDate().toString());
+                    var expDate = DateTime.parse(
+                        (doc['expirationDate'] as Timestamp)
+                            .toDate()
+                            .toString());
+                    final expiryDate = expDate.difference(todayDate).inDays;
+                    final quantity = doc['quantity'] as int;
+                    final storage = doc['storage'] as String;
+                    final unit = doc['unit'] as String;
+
+                    String imageAssetPath;
+                    if (name == 'Mushrooms') {
+                      imageAssetPath = 'lib/images/mushroom.png';
+                    } else if (name == 'Mushroom') {
+                      imageAssetPath = 'lib/images/mushroom.png';
+                    } else if (name == 'Avocado') {
+                      imageAssetPath = 'lib/images/avocado.png';
+                    } else if (name == 'Grapes') {
+                      imageAssetPath = 'lib/images/grapes.png';
+                    } else {
+                      imageAssetPath = 'lib/images/avocado.png';
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                          left: 39, right: 39, bottom: 21),
+                      child: Container(
+                        height: 87,
+                        width: 312,
+                        decoration: BoxDecoration(
+                            color: Color(0xFFFFFFFF),
+                            borderRadius: BorderRadius.circular(9),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xFF828282).withOpacity(0.2),
+                                blurRadius: 23,
+                                spreadRadius: -4,
+                                offset: Offset(0, 4.0),
+                              ),
+                            ]),
+                        child: Card(
+                          elevation: 0, // add a box shadow
+                          child: Container(
+                            //padding: EdgeInsets.all(16), // add some padding
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  top: 19,
+                                  left: 15,
+                                  child: Image.asset(
+                                    imageAssetPath,
+                                    width: 49,
+                                    height: 49,
+                                  ),
+                                ),
+                                //SizedBox(width: 16), // add some spacing
+                                Positioned(
+                                  top: 14,
+                                  left: 77,
+                                  child: Text(
+                                    '$name ($quantity $unit)',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        fontFamily: 'Montserrat',
+                                        color: Color(0XFF4E4E4E)),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 36,
+                                  left: 77,
+                                  child: Text(
+                                    '$storage',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        fontFamily: 'Montserrat',
+                                        color: Color(0XFF4E4E4E)),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 53,
+                                  left: 77,
+                                  child: Text(
+                                    'Expires: $expiryDate day(s)',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        fontFamily: 'Montserrat',
+                                        color: Color(0XFFFF4121)),
+                                  ),
+                                ),
+                                Positioned(
+                                    top: 27,
+                                    left: 216,
+                                    //right: 12,
+                                    child: Container(
+                                      height: 33,
+                                      width: 33,
+                                      child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            padding: EdgeInsets.all(9.5),
+                                            fixedSize: Size(33, 33),
+                                            /*textStyle: TextStyle(
+                                              fontSize: 10,
+                                              fontFamily: 'Montserrat',
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xFFFFFFFF)),*/
+                                            backgroundColor: Color(
+                                                0xFF44ACA1), // background color
+                                            elevation: 0, // elevation of button
+                                            //shadowColor: Colors.
+                                          ),
+                                          onPressed: () {},
+                                          child: Image.asset(
+                                              'lib/images/check2.png',
+                                              height: 14,
+                                              width: 14)
+                                          // label: Text("Elevated Button with Icon") ,
+                                          //child: const Text("Eaten"),
+                                          ),
+                                    )),
+                                Positioned(
+                                    top: 27,
+                                    left: 264,
+                                    //right: 12,
+                                    child: Container(
+                                      height: 33,
+                                      width: 33,
+                                      child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            padding: EdgeInsets.all(10.5),
+                                            fixedSize: Size(33, 33),
+                                            /*textStyle: TextStyle(
+                                              fontSize: 10,
+                                              fontFamily: 'Montserrat',
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xFFFFFFFF)),*/
+                                            backgroundColor: Color(
+                                                0xFFFF4121), // background color
+                                            elevation: 0, // elevation of button
+                                            //shadowColor: Colors.
+                                          ),
+                                          onPressed: () {},
+                                          child: Image.asset(
+                                              'lib/images/cross.png',
+                                              height: 11,
+                                              width: 12)
+                                          // label: Text("Elevated Button with Icon") ,
+                                          //child: const Text("Eaten"),
+                                          ),
+                                    )),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          )
+        ]));
   }
 }
 

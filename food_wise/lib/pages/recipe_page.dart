@@ -20,24 +20,25 @@ class Recipes extends StatefulWidget {
 }
 
 class _RecipesState extends State<Recipes> {
-  late Future<List<dynamic>> _recipes = Future.value([]); 
+  late Future<List<dynamic>> _recipes = Future.value([]);
 
   Future<void> updateRecipes(List<dynamic> recipeData) async {
     setState(() {
       _recipes = Future.value(recipeData);
     });
   }
-Future<List<String>> loadProductName() async {
-  var collection = FirebaseFirestore.instance.collection('Food');
-  var snapshot = await collection.get();
-  List<String> productNames = [];
-  for (var doc in snapshot.docs) {
-    String productName = doc.data()['name'] as String;
-    productNames.add(productName);
+
+  Future<List<String>> loadProductName() async {
+    var collection = FirebaseFirestore.instance.collection('Food');
+    var snapshot = await collection.get();
+    List<String> productNames = [];
+    for (var doc in snapshot.docs) {
+      String productName = doc.data()['name'] as String;
+      productNames.add(productName);
+    }
+    print(productNames);
+    return productNames;
   }
-  print(productNames);
-  return productNames;
-}
 
   /*Future<String> loadProductName() async {
     var collection = FirebaseFirestore.instance.collection('Food');
@@ -52,7 +53,7 @@ Future<List<String>> loadProductName() async {
 
   Future<List<dynamic>> fetchRecipes(String productName) async {
     final response = await http.get(Uri.parse(
-        'https://api.spoonacular.com/recipes/findByIngredients?ingredients=$productName&number=10&apiKey=dbbb9edadfc9476689cb4a761355c59f'));
+        'https://api.spoonacular.com/recipes/findByIngredients?ingredients=$productName&number=10&apiKey=7004f443b24947e082634dec9197d359'));
 
     if (response.statusCode == 200) {
       List<dynamic> recipes = json.decode(response.body);
@@ -68,69 +69,105 @@ Future<List<String>> loadProductName() async {
     }
   }
 
-Future<Map<String, dynamic>> fetchRecipe(int recipeId) async {
-  final response = await http.get(Uri.parse(
-      'https://api.spoonacular.com/recipes/$recipeId/information?includeNutrition=true&apiKey=dbbb9edadfc9476689cb4a761355c59f'));
+  Future<Map<String, dynamic>> fetchRecipe(int recipeId) async {
+    final response = await http.get(Uri.parse(
+        'https://api.spoonacular.com/recipes/$recipeId/information?includeNutrition=true&apiKey=7004f443b24947e082634dec9197d359'));
 
-  if (response.statusCode == 200) {
-    Map<String, dynamic> recipeData = json.decode(response.body);
-    String pictureUrl = recipeData['image'];
-    recipeData['picture'] = pictureUrl;
+    if (response.statusCode == 200) {
+      Map<String, dynamic> recipeData = json.decode(response.body);
+      String pictureUrl = recipeData['image'];
+      recipeData['picture'] = pictureUrl;
 
-    // Get time required to make recipe
-    int prepTime = recipeData['preparationMinutes'] ?? 0;
-    int cookTime = recipeData['cookingMinutes'] ?? 0;
-    int totalTime = prepTime + cookTime;
-    recipeData['totalTime'] = totalTime;
+      // Get time required to make recipe
+      int prepTime = recipeData['preparationMinutes'] ?? 0;
+      int cookTime = recipeData['cookingMinutes'] ?? 0;
+      int totalTime = prepTime + cookTime;
+      recipeData['totalTime'] = totalTime;
 
-    // Get number of calories in recipe
-    var nutrients = recipeData['nutrition']['nutrients'];
-    var nutrient = nutrients.firstWhere((nutrient) => nutrient['name'] == 'Calories', orElse: () => null);
-    int calories = nutrient != null ? nutrient['amount']?.round() ?? 0 : 0;
+      // Get number of calories in recipe
+      var nutrients = recipeData['nutrition']['nutrients'];
+      var nutrient = nutrients.firstWhere(
+          (nutrient) => nutrient['name'] == 'Calories',
+          orElse: () => null);
+      int calories = nutrient != null ? nutrient['amount']?.round() ?? 0 : 0;
 
-    recipeData['calories'] = calories;
+      recipeData['calories'] = calories;
 
-    // Get recipe instructions
-    final instructionResponse = await http.get(Uri.parse(
-        'https://api.spoonacular.com/recipes/$recipeId/analyzedInstructions?apiKey=dbbb9edadfc9476689cb4a761355c59f'));
+      // Get recipe instructions
+      final instructionResponse = await http.get(Uri.parse(
+          'https://api.spoonacular.com/recipes/$recipeId/analyzedInstructions?apiKey=7004f443b24947e082634dec9197d359'));
 
-    if (instructionResponse.statusCode == 200) {
-      List<dynamic> instructions = json.decode(instructionResponse.body);
-      recipeData['instructions'] = instructions;
+      if (instructionResponse.statusCode == 200) {
+        List<dynamic> instructions = json.decode(instructionResponse.body);
+        recipeData['instructions'] = instructions;
+      } else {
+        throw Exception('Failed to load recipe instructions');
+      }
+
+      return recipeData;
     } else {
-      throw Exception('Failed to load recipe instructions');
+      throw Exception('Failed to load recipe data');
     }
-
-    return recipeData;
-  } else {
-    throw Exception('Failed to load recipe data');
   }
-}
 
+  @override
+  void initState() {
+    super.initState();
+    loadProductName().then((productNames) {
+      for (var productName in productNames) {
+        fetchRecipes(productName);
+      }
+    });
+  }
 
-
- @override
-void initState() {
-  super.initState();
-  loadProductName().then((productNames) {
-    for (var productName in productNames) {
-      fetchRecipes(productName);
-    }
-  });
-}
-
-
-
-@override
-Widget build(BuildContext context) {
-  return FutureBuilder<List<dynamic>>(
-    future: _recipes,
-    builder: (context, snapshot) {
-      if (snapshot.hasData) {
-        final recipes = snapshot.data!;
-        return Column(
-          children: [
-            Container(
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<dynamic>>(
+      future: _recipes,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final recipes = snapshot.data!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: EdgeInsets.only(left: 39, top: 38),
+                child: Row(
+                    //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 83),
+                        child: Image.asset(
+                          'lib/images/logo.png',
+                          height: 23,
+                          width: 110,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: Image.asset(
+                          'lib/images/notification.png',
+                          height: 52,
+                          width: 52,
+                        ),
+                      ),
+                      Image.asset(
+                        'lib/images/profile.png',
+                        height: 52,
+                        width: 52,
+                      ),
+                    ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 39, top: 30),
+                child: Text('Find recipes',
+                    style: TextStyle(
+                        fontSize: 24,
+                        color: Color(0xFF4E4E4E),
+                        fontFamily: 'Montserat',
+                        fontWeight: FontWeight.w900)),
+              ),
+              /*Container(
               height: 80,
               color: Color(0xFF44ACA1),
               child: Center(
@@ -143,79 +180,92 @@ Widget build(BuildContext context) {
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height - 230,
-              child: ListView.builder(
-                itemCount: recipes.length,
-                itemBuilder: (context, index) {
-                  final recipe = recipes[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Color(0xFF929292).withOpacity(0.2),
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFF929292).withOpacity(0.2),
-                          blurRadius: 23,
-                          spreadRadius: 0,
-                          offset: Offset(0, 4.0),
-                        ),
-                      ],
-                    ),
-                    margin:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: GestureDetector(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              RecipeInstructionsScreen(recipe: recipe),
-                        ),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Left child with image in a rounded box
-                          Container(
-                            width: 55,
-                            height: 70,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
+            ),*/
+              SizedBox(
+                height: MediaQuery.of(context).size.height - 230,
+                child: ListView.builder(
+                  itemCount: recipes.length,
+                  itemBuilder: (context, index) {
+                    final recipe = recipes[index];
+                    return Container(
+                      /* height: 114,
+                      width: 312,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(6),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
                               color: Color(0xFF929292).withOpacity(0.2),
+                              blurRadius: 23,
+                              spreadRadius: -4,
+                              offset: Offset(0, 4.0),
                             ),
-                            padding: EdgeInsets.all(7),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                recipe['picture'],
-                                fit: BoxFit.cover, 
+                          ]),*/
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Color(0xFF929292).withOpacity(0.2),
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFF929292).withOpacity(0.2),
+                            blurRadius: 23,
+                            spreadRadius: 0,
+                            offset: Offset(0, 4.0),
+                          ),
+                        ],
+                      ),
+                      margin:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      child: GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                RecipeInstructionsScreen(recipe: recipe),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Left child with image in a rounded box
+                            Container(
+                              width: 55,
+                              height: 70,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Color(0xFF929292).withOpacity(0.2),
+                              ),
+                              padding: EdgeInsets.all(7),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  recipe['picture'],
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                          ),
-                          // Right child with title, time required, and calories
-                          Expanded(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Recipe title
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 5),
-                                    child:Text(
-                                      recipe['title'],
-                                      style: TextStyle(
+                            // Right child with title, time required, and calories
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Recipe title
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 5),
+                                      child: Text(
+                                        recipe['title'],
+                                        style: TextStyle(
                                           fontSize: 12,
                                           color: Color.fromRGBO(77, 77, 77, 1),
                                           fontFamily: 'Montserrat',
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                  ),
-                                 Row(
+                                    ),
+                                    Row(
                                       children: [
                                         Image.asset(
                                           'lib/images/weight.png',
@@ -227,17 +277,18 @@ Widget build(BuildContext context) {
                                           ' ${recipe['readyInMinutes']} minutes',
                                           style: TextStyle(
                                             fontSize: 6,
-                                            color: Color.fromRGBO(143, 143, 143, 1),
+                                            color: Color.fromRGBO(
+                                                143, 143, 143, 1),
                                             fontFamily: 'Montserrat',
                                           ),
                                         ),
                                       ],
                                     ),
-                                  SizedBox(height: 5),
-                                  // Calories
-                                
-                                  ///
-                                Row(
+                                    SizedBox(height: 5),
+                                    // Calories
+
+                                    ///
+                                    Row(
                                       children: [
                                         Image.asset(
                                           'lib/images/weight.png',
@@ -249,38 +300,36 @@ Widget build(BuildContext context) {
                                           ' ${recipe['calories']} kCal',
                                           style: TextStyle(
                                             fontSize: 6,
-                                            color: Color.fromRGBO(143, 143, 143, 1),
+                                            color: Color.fromRGBO(
+                                                143, 143, 143, 1),
                                             fontFamily: 'Montserrat',
                                           ),
                                         ),
                                       ],
                                     ),
-                                  //
-                                ],
+                                    //
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          );
+        } else if (snapshot.hasError) {
+          return Text('${snapshot.error}');
+        }
+        return Center(
+          child: CircularProgressIndicator(),
         );
-      } else if (snapshot.hasError) {
-        return Text('${snapshot.error}');
-      }
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    },
-  );
-}
-
-
-
+      },
+    );
+  }
 }
 
 //import 'package:flutter/material.dart';

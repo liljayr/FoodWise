@@ -1,5 +1,5 @@
-// import 'package:fl_chart/fl_chart.dart';
-// import 'package:flutter/material.dart';
+/*import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 
 // import 'package:food_wise/model/spending.dart';
 // import 'package:intl/intl.dart';
@@ -92,7 +92,7 @@
 //           break;
 //       }
 
-//       return Text(text);
-//     },
-//   );
-// }
+      return Text(text);
+    },
+  );
+}*/
