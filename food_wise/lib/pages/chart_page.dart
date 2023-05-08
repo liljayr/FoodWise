@@ -764,9 +764,12 @@ class _ChartPageState extends State<Charts> {
                                                     yValueMapper:
                                                         (ChartData data, _) =>
                                                             data.y,
-                                                    color: Color(0xFFFF4121),
-                                                    name: "Percentage"),
-                                              ]),
+                                                    dataLabelMapper: (ChartData data, _) => data.y.toString(),
+                                                    dataLabelSettings: DataLabelSettings(
+                                                      isVisible: true,
+                                                    color: Color(0xFFFF4121)),
+                                                    // name: "Percentage"),
+                                          )])
                                         ),
                                       ],
                                     ),
@@ -874,7 +877,7 @@ class _ChartPageState extends State<Charts> {
                                                 // name: ((ChartData data, _) => data.x) as String,
                                                 dataLabelMapper:
                                                     (ChartData data, _) =>
-                                                        data.x,
+                                                        data.y.toString(),
                                                 dataLabelSettings:
                                                     DataLabelSettings(
                                                         isVisible: true,
@@ -1050,7 +1053,12 @@ class _ChartPageState extends State<Charts> {
                                                   (Spending data, _) =>
                                                       data.price,
                                               color: Color(0xFFF7B24A),
-                                              name: "Monthly"),
+                                              dataLabelMapper: (Spending data, _) => data.price.toString(),
+                                              dataLabelSettings: DataLabelSettings(
+                                                isVisible: true,),
+                                                name: "Monthly consumed"
+                                                ),
+                                              // name: "Monthly"),
                                           ColumnSeries<Spending, String>(
                                               dataSource: spendingData,
                                               // onPointTap: (ChartPointDetails details) {
@@ -1069,8 +1077,12 @@ class _ChartPageState extends State<Charts> {
                                                   (Spending data, _) =>
                                                       data.waste,
                                               color: Color(0xFFF77F7C),
-                                              name: "Expired item expense")
-                                        ]),
+                                              dataLabelMapper: (Spending data, _) => data.price.toString(),
+                                              dataLabelSettings: DataLabelSettings(
+                                                isVisible: true,),
+                                                name: "Monthly wasted"
+                                              // name: "Expired item expense"),
+                                  )]),
                                   ),
                                 ],
                               )),
