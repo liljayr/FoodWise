@@ -25,7 +25,7 @@ class Charts extends StatefulWidget {
 class ChartData {
         ChartData(this.x, this.y, this.color);
         final String x;
-        final double? y;
+        double? y;
         final Color color;
         // final double? y2;
       }
@@ -46,6 +46,7 @@ class _ChartPageState extends State<Charts> {
   int totalEaten = 0;
   int totalLeft = 0;
 
+  List<ChartData> foodWasteAvoOG = [];
   List<ChartData> foodWasteAvo = [];
   //   ChartData("Veggies", 20, Color(0xFF1BA209)),
   //   ChartData("Meat", 40, Color(0xFF832205)),
@@ -106,9 +107,12 @@ class _ChartPageState extends State<Charts> {
 
   Future<int> Emissions(String polluter, String product) async{
     var collection = FirebaseFirestore.instance.collection('Avocado$polluter');
+    print('Avocado$polluter');
     var snapshot = await collection.get();
-    var emission = snapshot.docs.where((element) => element['product'] == product).first['Emission'];
+    var emission = snapshot.docs.where((element) => element['product'].toLowerCase() == product.toLowerCase()).first['Emission'];
     // print("YAYAYAYAYAY$emission");
+    print("Emission");
+    print(emission);
     return emission;
   }
 
@@ -117,13 +121,25 @@ class _ChartPageState extends State<Charts> {
     var snapshotEaten = await collectionEaten.get();
     var dataList = snapshotEaten.docs.toList();
     for(int i=0; i<dataList.length; i++){
+      print("What item $i");
+      print(dataList[i]['name']);
       var co2Emission = await Emissions('CO2', dataList[i]['name']);
       var h2oEmission = await Emissions('H2O', dataList[i]['name']);
       // print('$database $numItems');
       // print("AAAAA");
       // print(dataList[i]['category']);
-      var new_data = ChartData(dataList[i]['category'], dataList[i]['quantity'], Color(int.parse(dataList[i]['color'])));
-      finalList.add(new_data);
+      if(finalList.any((item) => item.x == dataList[i]['category'])){
+        var value = finalList.firstWhere((element) => element.x == dataList[i]['category']);
+        print('AAAAAAAAAAAAAAAAAAAA $value');
+        print(value.x);
+        print(value.y);
+        value.y = (value.y! + dataList[i]['quantity'])!;
+        print(value.y);
+      }
+      else{
+        var new_data = ChartData(dataList[i]['category'], dataList[i]['quantity'], Color(int.parse(dataList[i]['color'])));
+        finalList.add(new_data);
+      }
       co2TotalEmission = co2TotalEmission + co2Emission*dataList[i]['quantity'] as int;
       h2oTotalEmission = h2oTotalEmission + h2oEmission*dataList[i]['quantity'] as int;
       // print("YESSSSS");
@@ -133,6 +149,33 @@ class _ChartPageState extends State<Charts> {
       // print(co2TotalEmission/numItems);
     }
     return singleItemCount;
+  }
+
+  List<ChartData> percentage(dataList){
+    List<ChartData> finalList = [];
+    num count = 0;
+    for(int i=0; i<dataList.length; i++){
+      count = count + dataList[i].y;
+      // print(dataList[i].y);
+    }
+    print("COUNT FOR PERCENTAGEE $count");
+    for(int i=0; i<dataList.length; i++){
+      print("IS THIS TRUE OR NOT??????");
+      // if(finalList.any((item) => item.x == dataList[i].x)){
+      //   print(finalList.any((item) => item.x == dataList[i].x));
+      // }
+      // else{
+        print("PERCENTAGEEEE");
+        var item = dataList[i].y;
+        print("Here is the count $count, and the list number $item");
+        print((item/count)*100);
+        finalList.add(ChartData(dataList[i].x, ((item/count)*100), dataList[i].color));
+      // }
+    }
+    // finalList.add(ChartData(dataList[0].x, ((dataList[0].y/count)*100), dataList[0].color));
+    // finalList.add(ChartData(dataList[1].x, ((dataList[1].y/count)*100), dataList[0].color));
+    // finalList.add(ChartData(dataList[2].x, ((dataList[2].y/count)*100), dataList[0].color));
+    return finalList;
   }
 
   Future<List<Spending>> onLoad() async {
@@ -145,7 +188,7 @@ class _ChartPageState extends State<Charts> {
     var dataListSpent = snapshotSpent.docs.toList();
     spendingData = dataListSpent.map((e) => Spending(e.get('waste'),
       e.get('price'), e.get('date'), ChangeColor(e.get('price'), "price"),
-      ChangeColor(e.get('price'), "price"))).toList();
+      ChangeColor(e.get('waste'), "waste"))).toList();
     
     totalEaten = await loadList("AvocadoEaten", foodEatenAvo, totalEaten);
     print("Did this work? eaten????");
@@ -157,25 +200,41 @@ class _ChartPageState extends State<Charts> {
     print("Did this work? food????");
     print(foodLeftAvo.length);
       
-    totalWaste = await loadList('AvocadoWasted', foodWasteAvo, totalWaste);
-    print("Did this work? waste????");
-    print(foodWasteAvo.length);
+    totalWaste = await loadList('AvocadoWasted', foodWasteAvoOG, totalWaste);
+    // print("Did this work? waste????");
+    // print("WWWAAAASSSSTTTEEEE");
+    // print(foodWasteAvo.length);
+    // print(foodWasteAvo.first);
+    if(foodWasteAvo.isEmpty){
+      foodWasteAvo = percentage(foodWasteAvoOG);
+    }
 
     print("Is the total correct $numItems items, $totalLeft left, $totalEaten eaten, $totalWaste");
     print("Emissions $co2TotalEmission co2, $h2oTotalEmission h2o");
+
+    // numItems = (numItems/2).round();
 
     co2TotalEmission = (co2TotalEmission/numItems).round();
     h2oTotalEmission = (h2oTotalEmission/numItems).round();
     print("Is the total correct $numItems items, $totalLeft left, $totalEaten eaten, $totalWaste");
     print("Emissions $co2TotalEmission co2, $h2oTotalEmission h2o");
 
+    // print("WASTE AND STUFF");
+    // print((totalWaste/numItems)*100);
+    // print((totalLeft/numItems)*100);
+    // print((totalEaten/numItems)*100);
+    // print(numItems);
+    // print("Wasted $totalWaste, left $totalLeft, eaten: $totalEaten");
+
+    var totalItems = totalEaten + totalLeft + totalWaste;
+
     wasteData = [
-      ChartData('Wasted', (totalWaste/numItems)*100, Color(0xFFFF4121)),
-      ChartData('Left', (totalLeft/numItems)*100, Color(0xFFF7B24A)),
-      ChartData('Eaten', (totalEaten/numItems)*100, Color(0xFF44ACA1))
+      ChartData('Wasted', (totalWaste/totalItems)*100, Color(0xFFFF4121)),
+      ChartData('Left', (totalLeft/totalItems)*100, Color(0xFFF7B24A)),
+      ChartData('Eaten', (totalEaten/totalItems)*100, Color(0xFF44ACA1))
     ];
     print("Waste data has items!");
-    print(wasteData.length);
+    print(wasteData);
     return spendingData;
   }
   
@@ -451,7 +510,7 @@ class _ChartPageState extends State<Charts> {
                           xValueMapper: (ChartData data, _) => data.x,
                           yValueMapper: (ChartData data, _) => data.y,
                           // name: ((ChartData data, _) => data.x) as String,
-                          dataLabelMapper: (ChartData data, _) => data.x,
+                          dataLabelMapper: (ChartData data, _) => data.y.toString(),
                           dataLabelSettings: DataLabelSettings(
                             isVisible: true
                           )
@@ -572,7 +631,9 @@ class _ChartPageState extends State<Charts> {
                             text: "Spending",
                             alignment: ChartAlignment.near
                           ),
-                          primaryXAxis: CategoryAxis(),
+                          primaryXAxis: CategoryAxis(
+                            maximumLabelWidth: 80,
+                          ),
                           legend: Legend(
                             isVisible: true,
                             position: LegendPosition.top
@@ -593,7 +654,11 @@ class _ChartPageState extends State<Charts> {
                                 xValueMapper: (Spending data, _) => data.date,
                                 yValueMapper: (Spending data, _) => data.price,
                                 color: Color(0xFF44ACA1),
-                                name: "Money Spent"
+                                name: "Money Spent",
+                                dataLabelMapper: (Spending data, _) => data.waste.toString(),
+                                dataLabelSettings: DataLabelSettings(
+                                  isVisible: true
+                                )
                               ),
                               ColumnSeries<Spending, String>(
                                 dataSource: spendingData,
@@ -610,7 +675,11 @@ class _ChartPageState extends State<Charts> {
                                 xValueMapper: (Spending data, _) => data.date,
                                 yValueMapper: (Spending data, _) => data.waste,
                                 color: Color(0xFFF7B24A),
-                                name: "Money Wasted"
+                                name: "Money Wasted",
+                                dataLabelMapper: (Spending data, _) => data.waste.toString(),
+                                dataLabelSettings: DataLabelSettings(
+                                  isVisible: true
+                                )
                               )
                             ]
                           )
