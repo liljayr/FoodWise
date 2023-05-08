@@ -161,8 +161,9 @@ class _AddItemState extends State<AddItem> {
           child: Center(
             child: Form(
           child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                  Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(left: 39),
               child: Text("Product",
@@ -348,7 +349,8 @@ class _AddItemState extends State<AddItem> {
                     //   },
                     // ),
                   ],
-                ))
+                )
+                )
               ],
             ),
             Row(
@@ -598,57 +600,61 @@ class _AddItemState extends State<AddItem> {
             //     );
             //   },
             // ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 39, top: 30),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              //borderRadius: BorderRadius.circular(14),
-                              //color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xFF929292).withOpacity(0.2),
-                                  blurRadius: 23,
-                                  spreadRadius: -4,
-                                  offset: Offset(0, 4.0),
-                                ),
-                              ]),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(14), // <-- Radius
-                              ),
-
-                              //padding: EdgeInsets.all(12),
-
-                              fixedSize: Size(312, 54),
-                              textStyle: TextStyle(
-                                  fontSize: 17,
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFFFFFFFF)),
-                              backgroundColor:
-                                  Color(0xFF44ACA1), // background color
-                              elevation: 0, // elevation of button
-                              //shadowColor: Colors.
+            Row(
+              children:[
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 39, top: 30),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          //borderRadius: BorderRadius.circular(14),
+                          //color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFF929292).withOpacity(0.2),
+                              blurRadius: 23,
+                              spreadRadius: -4,
+                              offset: Offset(0, 4.0),
                             ),
-                            child: const Text('Add product'),
-                            onPressed: () {
-                              print("Here are all the values");
-                              print(productName);
-                              print(quantity);
-                              print(price);
-                              print(expirationDate);
-                              print(unitSelection);
-                              print(fridgeCheckbox);
-                              print(freezeCheckbox);
-                              print(pantryCheckbox);
-                              addToDB();
-                              print("AADDEDDD to DB");
-                              Navigator.pop(context);
-                            },
-              ),)),
+                          ]),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(14), // <-- Radius
+                          ),
+
+                          //padding: EdgeInsets.all(12),
+
+                          fixedSize: Size(312, 54),
+                          textStyle: TextStyle(
+                              fontSize: 17,
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFFFFFFF)),
+                          backgroundColor:
+                              Color(0xFF44ACA1), // background color
+                          elevation: 0, // elevation of button
+                          //shadowColor: Colors.
+                        ),
+                        child: const Text('Add product'),
+                        onPressed: () {
+                          // print("Here are all the values");
+                          // print(productName);
+                          // print(quantity);
+                          // print(price);
+                          // print(expirationDate);
+                          // print(unitSelection);
+                          // print(fridgeCheckbox);
+                          // print(freezeCheckbox);
+                          // print(pantryCheckbox);
+                          addToDB();
+                          // print("AADDEDDD to DB");
+                          Navigator.pop(context);
+                        },
+                  ),)),
+                )
+              ]
             )
           ]),
         ))));

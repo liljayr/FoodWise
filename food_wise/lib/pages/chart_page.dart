@@ -128,11 +128,11 @@ class _ChartPageState extends State<Charts> {
       // print(dataList[i]['category']);
       if(finalList.any((item) => item.x == dataList[i]['category'])){
         var value = finalList.firstWhere((element) => element.x == dataList[i]['category']);
-        print('AAAAAAAAAAAAAAAAAAAA $value');
-        print(value.x);
-        print(value.y);
+        // print('AAAAAAAAAAAAAAAAAAAA $value');
+        // print(value.x);
+        // print(value.y);
         value.y = (value.y! + dataList[i]['quantity'])!;
-        print(value.y);
+        // print(value.y);
       }
       else{
         var new_data = ChartData(dataList[i]['category'], dataList[i]['quantity'], Color(int.parse(dataList[i]['color'])));
@@ -227,9 +227,9 @@ class _ChartPageState extends State<Charts> {
     var totalItems = totalEaten + totalLeft + totalWaste;
 
     wasteData = [
-      ChartData('Wasted', (totalWaste/totalItems)*100, Color(0xFFFF4121)),
-      ChartData('Left', (totalLeft/totalItems)*100, Color(0xFFF7B24A)),
-      ChartData('Eaten', (totalEaten/totalItems)*100, Color(0xFF44ACA1))
+      ChartData('Wasted', ((totalWaste/totalItems)*100).roundToDouble(), Color(0xFFFF4121)),
+      ChartData('Left', ((totalLeft/totalItems)*100).roundToDouble(), Color(0xFFF7B24A)),
+      ChartData('Eaten', ((totalEaten/totalItems)*100).roundToDouble(), Color(0xFF44ACA1))
     ];
     print("Waste data has items!");
     print(wasteData);
@@ -333,20 +333,20 @@ class _ChartPageState extends State<Charts> {
   // }
 
   void setVisibility(int pointIndex) {
-    print("Changing visibility pleeease");
+    // print("Changing visibility pleeease");
     setState(() {
       if (!_visible) {
         // showing main chart, visible = false
-        print("change to show detailed chart");
+        // print("change to show detailed chart");
         if (pointIndex == 0) {
           // click on waste chart
-          print("Click on waste chart");
+          // print("Click on waste chart");
           wasteChart = !wasteChart; // wasteChart false -> true
           detailsChart = pointIndex; // set detailsChart -1 -> 0
           _visible = !_visible; // visible false -> true
         } else if (pointIndex == 1 || pointIndex == 2) {
           // click on left or eat chart
-          print("Click on left or eaten chart");
+          // print("Click on left or eaten chart");
           detailsChart = pointIndex; // set detailsChart -1 -> 0
           _visible = !_visible; // visible false -> true
           if (pointIndex == 1) {
@@ -359,21 +359,21 @@ class _ChartPageState extends State<Charts> {
         }
       } else {
         // Showing detailed chart already
-        print("Already showing detailed chart");
-        print(detailsChart);
-        print(pointIndex);
+        // print("Already showing detailed chart");
+        // print(detailsChart);
+        // print(pointIndex);
         if (pointIndex == detailsChart) {
           // reclick on same part of chart
-          print("reclick on same chart part");
+          // print("reclick on same chart part");
           _visible = !_visible;
           wasteChart = false;
           detailsChart = -1;
         } else if (detailsChart == 0) {
           // clicking from waste chart
-          print("Clicking away from waste chart");
+          // print("Clicking away from waste chart");
           wasteChart = !wasteChart;
           detailsChart = pointIndex;
-          print(wasteChart);
+          // print(wasteChart);
           if (pointIndex == 1) {
             foodEatenLeftAvo = foodLeftAvo;
             leftEatenStr = "Food Left";
@@ -385,10 +385,10 @@ class _ChartPageState extends State<Charts> {
           // clicking from left or eaten
           if (pointIndex == 0) {
             // clicking to waste
-            print("going from left or eaten to waste");
+            // print("going from left or eaten to waste");
             wasteChart = !wasteChart;
           }
-          print("going between left and eaten charts");
+          // print("going between left and eaten charts");
           detailsChart = pointIndex;
           if (pointIndex == 1) {
             foodEatenLeftAvo = foodLeftAvo;
@@ -597,6 +597,7 @@ class _ChartPageState extends State<Charts> {
                                         // name: ((ChartData data, _) => data.x) as String,
                                         //dataLabelMapper: (ChartData data, _) =>
                                         //  data.x,
+                                        dataLabelMapper: (ChartData data, _) => data.y.toString(),
                                         dataLabelSettings: DataLabelSettings(
                                             isVisible: true,
                                             labelPosition:
