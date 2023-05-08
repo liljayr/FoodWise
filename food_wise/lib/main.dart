@@ -61,8 +61,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'My App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: const  Color(0xFF44ACA1)),
+        colorScheme:
+            ColorScheme.fromSwatch().copyWith(primary: const Color(0xFF44ACA1)),
       ),
       home: FutureBuilder<QuerySnapshot>(
         future: FirebaseFirestore.instance.collection('Food').get(),
@@ -149,38 +149,383 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text("FoodWise"),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              child: const Text('Avocado'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Main(pageType: "Avocado",)),
-                );
-              },
+      backgroundColor: Colors.white,
+      //appBar: AppBar(
+      // Here we take the value from the MyHomePage object that was created by
+      // the App.build method, and use it to set our appbar title.
+      //title: Text("FoodWise"),
+      // ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.only(left: 39, top: 120),
+            child: Text('What do you want to',
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Color(0xFF4E4E4E),
+                    fontFamily: 'Montserat',
+                    fontWeight: FontWeight.w900)),
+          ),
+          SizedBox(
+            height: 2,
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 39),
+            child: Text('track?',
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Color(0xFF4E4E4E),
+                    fontFamily: 'Montserat',
+                    fontWeight: FontWeight.w900)),
+          ),
+          SizedBox(
+            height: 60.5,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 39, right: 39),
+            child: Container(
+              height: 78,
+              width: 312,
+              // color: Colors.white,
+              decoration: BoxDecoration(
+                  //borderRadius: BorderRadius.circular(14),
+                  //color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFF929292).withOpacity(0.2),
+                      blurRadius: 23,
+                      spreadRadius: -4,
+                      offset: Offset(0, 4.0),
+                    ),
+                  ]),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14), // <-- Radius
+                  ),
+                  //padding: EdgeInsets.all(12),
+
+                  //fixedSize: Size(312, 54),
+                  /*textStyle: TextStyle(
+                                fontSize: 17,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFFFFFFF)),*/
+                  backgroundColor: Color(0xFFFFFFFF), // background color
+                  elevation: 0, // elevation of button
+                  //shadowColor: Colors.
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Main(
+                              pageType: "Veggie",
+                            )),
+                  );
+                },
+                child: Row(children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12),
+                    child: Container(
+                      height: 39,
+                      width: 39,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF7B24A).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(7),
+                        child: Image.asset(
+                          'lib/images/veg.png',
+                          height: 22.86,
+                          width: 24.92,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24),
+                    child: Text('Fruits & vegetables',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF4E4E4E),
+                            fontFamily: 'Montserat',
+                            fontWeight: FontWeight.w700)),
+                  ),
+                  /*RadioListTile(
+                value: 2,
+                groupValue: null,
+                onChanged: null,
+              ),*/
+                ]),
+              ),
             ),
-            ElevatedButton(
-              child: const Text('Veggies'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Main(pageType: "Veggie",)),
-                );
-              },
-            )
-          ],
-        ),
-      ),// This trailing comma makes auto-formatting nicer for build methods.
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 39, right: 39),
+            child: Container(
+              height: 78,
+              width: 312,
+              // color: Colors.white,
+              decoration: BoxDecoration(
+                  //borderRadius: BorderRadius.circular(14),
+                  //color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFF929292).withOpacity(0.2),
+                      blurRadius: 23,
+                      spreadRadius: -4,
+                      offset: Offset(0, 4.0),
+                    ),
+                  ]),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14), // <-- Radius
+                  ),
+                  //padding: EdgeInsets.all(12),
+
+                  //fixedSize: Size(312, 54),
+                  /*textStyle: TextStyle(
+                                fontSize: 17,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFFFFFFF)),*/
+                  backgroundColor: Color(0xFFFFFFFF), // background color
+                  elevation: 0, // elevation of button
+                  //shadowColor: Colors.
+                ),
+                onPressed: () {},
+                child: Row(children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12),
+                    child: Container(
+                      height: 39,
+                      width: 39,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF77F7C).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(7),
+                        child: Image.asset(
+                          'lib/images/meat.png',
+                          height: 22.86,
+                          width: 24.92,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24),
+                    child: Text('Meat',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF4E4E4E),
+                            fontFamily: 'Montserat',
+                            fontWeight: FontWeight.w700)),
+                  ),
+                  /*RadioListTile(
+                value: 2,
+                groupValue: null,
+                onChanged: null,
+              ),*/
+                ]),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 39, right: 39),
+            child: Container(
+              height: 78,
+              width: 312,
+              // color: Colors.white,
+              decoration: BoxDecoration(
+                  //borderRadius: BorderRadius.circular(14),
+                  //color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFF929292).withOpacity(0.2),
+                      blurRadius: 23,
+                      spreadRadius: -4,
+                      offset: Offset(0, 4.0),
+                    ),
+                  ]),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14), // <-- Radius
+                  ),
+                  //padding: EdgeInsets.all(12),
+
+                  //fixedSize: Size(312, 54),
+                  /*textStyle: TextStyle(
+                                fontSize: 17,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFFFFFFF)),*/
+                  backgroundColor: Color(0xFFFFFFFF), // background color
+                  elevation: 0, // elevation of button
+                  //shadowColor: Colors.
+                ),
+                onPressed: () {},
+                child: Row(children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12),
+                    child: Container(
+                      height: 39,
+                      width: 39,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF6192DA).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(7),
+                        child: Image.asset(
+                          'lib/images/diary.png',
+                          height: 22.86,
+                          width: 24.92,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24),
+                    child: Text('Dairy products',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF4E4E4E),
+                            fontFamily: 'Montserat',
+                            fontWeight: FontWeight.w700)),
+                  ),
+                  /*RadioListTile(
+                value: 2,
+                groupValue: null,
+                onChanged: null,
+              ),*/
+                ]),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 39, right: 39),
+            child: Container(
+              height: 78,
+              width: 312,
+              // color: Colors.white,
+              decoration: BoxDecoration(
+                  //borderRadius: BorderRadius.circular(14),
+                  //color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFF929292).withOpacity(0.2),
+                      blurRadius: 23,
+                      spreadRadius: -4,
+                      offset: Offset(0, 4.0),
+                    ),
+                  ]),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14), // <-- Radius
+                  ),
+                  //padding: EdgeInsets.all(12),
+
+                  //fixedSize: Size(312, 54),
+                  /*textStyle: TextStyle(
+                                fontSize: 17,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFFFFFFF)),*/
+                  backgroundColor: Color(0xFFFFFFFF), // background color
+                  elevation: 0, // elevation of button
+                  //shadowColor: Colors.
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Main(
+                              pageType: "Avocado",
+                            )),
+                  );
+                },
+                child: Row(children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12),
+                    child: Container(
+                      height: 39,
+                      width: 39,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF44ACA1).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(7),
+                        child: Image.asset(
+                          'lib/images/avo.png',
+                          height: 22.86,
+                          width: 24.92,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24),
+                    child: Text('Avocado',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF4E4E4E),
+                            fontFamily: 'Montserat',
+                            fontWeight: FontWeight.w700)),
+                  ),
+                  /*RadioListTile(
+                value: 2,
+                groupValue: null,
+                onChanged: null,
+              ),*/
+                ]),
+              ),
+            ),
+          ),
+
+          /* ElevatedButton(
+            child: const Text('Avocado'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Main(
+                          pageType: "Avocado",
+                        )),
+              );
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Veggies'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Main(
+                          pageType: "Veggie",
+                        )),
+              );
+            },
+          ),*/
+        ],
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

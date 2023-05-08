@@ -25,7 +25,7 @@ class Charts extends StatefulWidget {
 class ChartData {
         ChartData(this.x, this.y, this.color);
         final String x;
-        final double? y;
+        double? y;
         final Color color;
         // final double? y2;
       }
@@ -33,11 +33,20 @@ class ChartData {
 class _ChartPageState extends State<Charts> {
   late List<charts.Series<Spending, String>> _seriesBarData;
   late List<Spending> mydata;
-  late List<ChartData> wasteData;
+  late List<ChartData> wasteData = [];
+  late List<Spending> spentData;
+  late List<Spending> spendingData;
   bool _visible = false;
   bool wasteChart = false;
   int detailsChart = -1;
+  late int co2TotalEmission = 0;
+  late int h2oTotalEmission = 0;
+  late int numItems = 0;
+  int totalWaste = 0;
+  int totalEaten = 0;
+  int totalLeft = 0;
 
+  List<ChartData> foodWasteAvoOG = [];
   List<ChartData> foodWasteAvo = [];
   //   ChartData("Veggies", 20, Color(0xFF1BA209)),
   //   ChartData("Meat", 40, Color(0xFF832205)),
@@ -57,7 +66,7 @@ class _ChartPageState extends State<Charts> {
   String leftEatenStr = "";
 
   _generateData(mydata) {
-    _seriesBarData = [];// List<charts.Series<Spending, String>>();
+    _seriesBarData = []; // List<charts.Series<Spending, String>>();
     _seriesBarData.add(
       charts.Series(
         domainFn: (Spending sales, _) => sales.date.toString(),
@@ -72,14 +81,12 @@ class _ChartPageState extends State<Charts> {
   }
 
   ChangeColor(int value, String column) {
-    if(value > 5) {
+    if (value > 5) {
       return Color(0xFFFF4121);
-    }
-    else{
-      if(column == "price"){
+    } else {
+      if (column == "price") {
         return Color(0xFF44ACA1);
-      }
-      else {
+      } else {
         return Color(0xFFF7B24A);
       }
     }
@@ -87,105 +94,227 @@ class _ChartPageState extends State<Charts> {
 
   @override
   void initState() {
-    wasteData = [
-      ChartData('Wasted', 25, Color(0xFFFF4121)),
-      ChartData('Left', 60, Color(0xFFF7B24A)),
-      ChartData('Eaten', 15, Color(0xFF44ACA1))
-    ];
+    // wasteData = [
+    //   ChartData('Wasted', 25, Color(0xFFFF4121)),
+    //   ChartData('Left', 60, Color(0xFFF7B24A)),
+    //   ChartData('Eaten', 15, Color(0xFF44ACA1))
+    // ];
     super.initState();
-    onLoad();
+    // onLoad();
   }
 
-  Future<void> onLoad() async {
-    var collectionEaten = FirebaseFirestore.instance.collection('AvocadoEaten');
+  Future<int> Emissions(String polluter, String product) async{
+    var collection = FirebaseFirestore.instance.collection('Avocado$polluter');
+    print('Avocado$polluter');
+    var snapshot = await collection.get();
+    var emission = snapshot.docs.where((element) => element['product'].toLowerCase() == product.toLowerCase()).first['Emission'];
+    // print("YAYAYAYAYAY$emission");
+    print("Emission");
+    print(emission);
+    return emission;
+  }
+
+  Future<int> loadList( String database, List<ChartData> finalList, int singleItemCount) async{
+    var collectionEaten = FirebaseFirestore.instance.collection(database);
     var snapshotEaten = await collectionEaten.get();
-    var dataListEaten = snapshotEaten.docs.toList();
-    foodEatenAvo = dataListEaten.map((e) => ChartData(e.get('category'),
-      e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
-
-    print("Get left food");
-      
-    var collectionFood = FirebaseFirestore.instance.collection('AvocadoFood');
-    var snapshotFood = await collectionFood.get();
-    var dataListFood = snapshotFood.docs.toList();
-    print("about to go");
-    print(dataListFood);
-    for(var i = 0; i < dataListFood.length; i++){
-      print(dataListFood[i]);
-      print("aaaaaaa");
-      print(dataListFood[i]['quantity']);
+    var dataList = snapshotEaten.docs.toList();
+    for(int i=0; i<dataList.length; i++){
+      print("What item $i");
+      print(dataList[i]['name']);
+      var co2Emission = await Emissions('CO2', dataList[i]['name']);
+      var h2oEmission = await Emissions('H2O', dataList[i]['name']);
+      // print('$database $numItems');
+      // print("AAAAA");
+      // print(dataList[i]['category']);
+      if(finalList.any((item) => item.x == dataList[i]['category'])){
+        var value = finalList.firstWhere((element) => element.x == dataList[i]['category']);
+        print('AAAAAAAAAAAAAAAAAAAA $value');
+        print(value.x);
+        print(value.y);
+        value.y = (value.y! + dataList[i]['quantity'])!;
+        print(value.y);
+      }
+      else{
+        var new_data = ChartData(dataList[i]['category'], dataList[i]['quantity'], Color(int.parse(dataList[i]['color'])));
+        finalList.add(new_data);
+      }
+      co2TotalEmission = co2TotalEmission + co2Emission*dataList[i]['quantity'] as int;
+      h2oTotalEmission = h2oTotalEmission + h2oEmission*dataList[i]['quantity'] as int;
+      // print("YESSSSS");
+      // print(co2TotalEmission);
+      numItems = numItems + dataList[i]['quantity']*dataList[i]['price'] as int;
+      singleItemCount = singleItemCount + dataList[i]['quantity']*dataList[i]['price'] as int;
+      // print(co2TotalEmission/numItems);
     }
-    print("is this right");
-    foodLeftAvo = dataListFood.map((e) => ChartData(e.get('category'),
-      e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
-
-    print("is this ruight????????");
-    print(foodLeftAvo);
-      
-    var collectionWasted = FirebaseFirestore.instance.collection('AvocadoWasted');
-    var snapshotWasted = await collectionWasted.get();
-    var dataListWasted = snapshotWasted.docs.toList();
-    foodWasteAvo = dataListWasted.map((e) => ChartData(e.get('category'),
-      e.get('quantity'), Color(int.parse(e.get('color'))))).toList();
-    // print("ONLOAD");
-    // snapshot.docs.map((e) {
-    //     print("Mapping e to get what it is");
-    //     print(e.data());
-    //     print(e['category']);
-    //   }
-    // );
-    // print("Did this work at all?");
-    // print(mapperThingy);
-    // print(dataList);
-    // print(dataList[0]['category']);
-    // print("done!");
-    // var data = snapshot.docs.first.data();
-    // if (data != null && data['name'] != null) {
-    //   setState(() {
-    //     this.productName = data['name'] as String;
-    //   });
-    // }
-    //this.productName = snapshot.docs.first.data()['name'] as String;
-    // print("product name:");
-    // print(this.productName);
+    return singleItemCount;
   }
-  
+
+  List<ChartData> percentage(dataList){
+    List<ChartData> finalList = [];
+    num count = 0;
+    for(int i=0; i<dataList.length; i++){
+      count = count + dataList[i].y;
+      // print(dataList[i].y);
+    }
+    print("COUNT FOR PERCENTAGEE $count");
+    for(int i=0; i<dataList.length; i++){
+      print("IS THIS TRUE OR NOT??????");
+      // if(finalList.any((item) => item.x == dataList[i].x)){
+      //   print(finalList.any((item) => item.x == dataList[i].x));
+      // }
+      // else{
+        print("PERCENTAGEEEE");
+        var item = dataList[i].y;
+        print("Here is the count $count, and the list number $item");
+        print((item/count)*100);
+        finalList.add(ChartData(dataList[i].x, ((item/count)*100), dataList[i].color));
+      // }
+    }
+    // finalList.add(ChartData(dataList[0].x, ((dataList[0].y/count)*100), dataList[0].color));
+    // finalList.add(ChartData(dataList[1].x, ((dataList[1].y/count)*100), dataList[0].color));
+    // finalList.add(ChartData(dataList[2].x, ((dataList[2].y/count)*100), dataList[0].color));
+    return finalList;
+  }
+
+  Future<List<Spending>> onLoad() async {
+    // co2TotalEmission = 0;
+    // h2oTotalEmission = 0;
+    // numItems = 0;
+
+    var collectionSpent = FirebaseFirestore.instance.collection('AvocadoSpentTest');
+    var snapshotSpent = await collectionSpent.get();
+    var dataListSpent = snapshotSpent.docs.toList();
+    spendingData = dataListSpent.map((e) => Spending(e.get('waste'),
+      e.get('price'), e.get('date'), ChangeColor(e.get('price'), "price"),
+      ChangeColor(e.get('waste'), "waste"))).toList();
+    
+    totalEaten = await loadList("AvocadoEaten", foodEatenAvo, totalEaten);
+    print("Did this work? eaten????");
+    print(foodEatenAvo.length);
+
+    // print("Get left food");
+
+    totalLeft = await loadList('AvocadoFood', foodLeftAvo, totalLeft);
+    print("Did this work? food????");
+    print(foodLeftAvo.length);
+      
+    totalWaste = await loadList('AvocadoWasted', foodWasteAvoOG, totalWaste);
+    // print("Did this work? waste????");
+    // print("WWWAAAASSSSTTTEEEE");
+    // print(foodWasteAvo.length);
+    // print(foodWasteAvo.first);
+    if(foodWasteAvo.isEmpty){
+      foodWasteAvo = percentage(foodWasteAvoOG);
+    }
+
+    print("Is the total correct $numItems items, $totalLeft left, $totalEaten eaten, $totalWaste");
+    print("Emissions $co2TotalEmission co2, $h2oTotalEmission h2o");
+
+    // numItems = (numItems/2).round();
+
+    co2TotalEmission = (co2TotalEmission/numItems).round();
+    h2oTotalEmission = (h2oTotalEmission/numItems).round();
+    print("Is the total correct $numItems items, $totalLeft left, $totalEaten eaten, $totalWaste");
+    print("Emissions $co2TotalEmission co2, $h2oTotalEmission h2o");
+
+    // print("WASTE AND STUFF");
+    // print((totalWaste/numItems)*100);
+    // print((totalLeft/numItems)*100);
+    // print((totalEaten/numItems)*100);
+    // print(numItems);
+    // print("Wasted $totalWaste, left $totalLeft, eaten: $totalEaten");
+
+    var totalItems = totalEaten + totalLeft + totalWaste;
+
+    wasteData = [
+      ChartData('Wasted', (totalWaste/totalItems)*100, Color(0xFFFF4121)),
+      ChartData('Left', (totalLeft/totalItems)*100, Color(0xFFF7B24A)),
+      ChartData('Eaten', (totalEaten/totalItems)*100, Color(0xFF44ACA1))
+    ];
+    print("Waste data has items!");
+    print(wasteData);
+    return spendingData;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Chart')),
+      //appBar: AppBar(title: Text('Chart')),
       body: _buildBody(context),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
-    print("IS THEE PAGE KIND HERE");
-    print(widget.pageType);
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('AvocadoSpentTest').snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return LinearProgressIndicator();
-        } else {
-          List<Spending> sales = snapshot.data?.docs
-              .map((documentSnapshot) => Spending(
-                documentSnapshot.get('waste'),
-                documentSnapshot.get('price'),
-                documentSnapshot.get('date'),
-                ChangeColor(documentSnapshot.get('price'), "price"),
-                ChangeColor(documentSnapshot.get('price'), "waste")))
-              //Spending.fromMap(date, documentSnapshot.get('date')))
-              .toList() as List<Spending>;
-          print("JKASHDFKJSHF");
-          print(sales);
-          return _buildChart(context, sales);
+  Widget _buildBody(BuildContext context){
+    var done = onLoad();
+    return FutureBuilder<List<Spending>>(
+      future: onLoad(),
+      builder: (context, snapshot){
+        if(snapshot.hasData){
+          return _buildChart(context);
         }
+        return Center(
+          child: CircularProgressIndicator()
+        );
       },
     );
+    // return Scaffold(
+    //   body: done == true//!wasteData.isEmpty
+    //   ? Text('data')//_buildChart(context, spentData)
+    //   : Center(
+    //           child: CircularProgressIndicator(),
+    //         )
+    // );
+    // (!wasteData.isEmpty && )
+    // _buildChart(context, spentData);
   }
-  // Widget _buildChart(BuildContext context, List<Spending> saledata) {
-  //   mydata = saledata;
+
+  // Widget _buildBody(BuildContext context) {
+  //   print("IS THEE PAGE KIND HERE");
+  //   print(widget.pageType);
+  //   return MaterialApp(
+  //     debugShowCheckedModeBanner: false,
+  //     title: 'My App',
+  //     theme: ThemeData(
+  //       colorScheme: ColorScheme.fromSwatch().copyWith(
+  //         primary: const  Color(0xFF44ACA1)),
+  //     ),
+  //     home: FutureBuilder<QuerySnapshot>(
+  //     future: FirebaseFirestore.instance.collection('AvocadoSpentTest').get(),
+  //     builder: (context, snapshot) {
+  //       // if(!wasteData.isEmpty){
+  //         print("Should load");
+  //         var wasteBool = wasteData.isEmpty;
+  //         print("waste data is not empty $wasteBool");
+  //         if (!snapshot.hasData) {
+  //           return LinearProgressIndicator();
+  //         } else {
+  //           List<Spending> sales = snapshot.data?.docs
+  //               .map((documentSnapshot) => Spending(
+  //                 documentSnapshot.get('waste'),
+  //                 documentSnapshot.get('price'),
+  //                 documentSnapshot.get('date'),
+  //                 ChangeColor(documentSnapshot.get('price'), "price"),
+  //                 ChangeColor(documentSnapshot.get('price'), "waste")))
+  //               //Spending.fromMap(date, documentSnapshot.get('date')))
+  //               .toList() as List<Spending>;
+  //           print("JKASHDFKJSHF");
+  //           print(sales);
+  //           return _buildChart(context, sales);
+  //         }
+  //       // }
+  //       // else{
+  //       //   print("Endless loop");
+  //       //   print(wasteData.isEmpty);
+  //       //   onLoad();
+  //       //   return CircularProgressIndicator();
+  //       // }
+  //     },
+  //   )
+  //   );
+  // }
+
+  // Widget _buildChart(BuildContext context, List<Spending> spendingData) {
+  //   mydata = spendingData;
   //   _generateData(mydata);
   //   return Scaffold(
   //     // appBar: AppBar(
@@ -206,64 +335,65 @@ class _ChartPageState extends State<Charts> {
   void setVisibility(int pointIndex) {
     print("Changing visibility pleeease");
     setState(() {
-      if(!_visible){   // showing main chart, visible = false
+      if (!_visible) {
+        // showing main chart, visible = false
         print("change to show detailed chart");
-        if(pointIndex == 0){    // click on waste chart
+        if (pointIndex == 0) {
+          // click on waste chart
           print("Click on waste chart");
-          wasteChart = !wasteChart;   // wasteChart false -> true
-          detailsChart = pointIndex;  // set detailsChart -1 -> 0
-          _visible = !_visible;       // visible false -> true
-        }
-        else if(pointIndex == 1 || pointIndex == 2){    // click on left or eat chart
+          wasteChart = !wasteChart; // wasteChart false -> true
+          detailsChart = pointIndex; // set detailsChart -1 -> 0
+          _visible = !_visible; // visible false -> true
+        } else if (pointIndex == 1 || pointIndex == 2) {
+          // click on left or eat chart
           print("Click on left or eaten chart");
-          detailsChart = pointIndex;  // set detailsChart -1 -> 0
-          _visible = !_visible;       // visible false -> true
-          if(pointIndex == 1){
+          detailsChart = pointIndex; // set detailsChart -1 -> 0
+          _visible = !_visible; // visible false -> true
+          if (pointIndex == 1) {
             foodEatenLeftAvo = foodLeftAvo;
             leftEatenStr = "Food Left";
-          }
-          else {
+          } else {
             foodEatenLeftAvo = foodEatenAvo;
             leftEatenStr = "Food Eaten";
           }
         }
-      }
-      else {    // Showing detailed chart already
+      } else {
+        // Showing detailed chart already
         print("Already showing detailed chart");
         print(detailsChart);
         print(pointIndex);
-        if(pointIndex == detailsChart){   // reclick on same part of chart
+        if (pointIndex == detailsChart) {
+          // reclick on same part of chart
           print("reclick on same chart part");
           _visible = !_visible;
           wasteChart = false;
           detailsChart = -1;
-        }
-        else if(detailsChart == 0){   // clicking from waste chart
+        } else if (detailsChart == 0) {
+          // clicking from waste chart
           print("Clicking away from waste chart");
           wasteChart = !wasteChart;
           detailsChart = pointIndex;
           print(wasteChart);
-          if(pointIndex == 1){
+          if (pointIndex == 1) {
             foodEatenLeftAvo = foodLeftAvo;
             leftEatenStr = "Food Left";
-          }
-          else {
+          } else {
             foodEatenLeftAvo = foodEatenAvo;
             leftEatenStr = "Food Eaten";
           }
-        }
-        else if(detailsChart == 1 || detailsChart == 2){  // clicking from left or eaten
-          if(pointIndex == 0){    // clicking to waste
+        } else if (detailsChart == 1 || detailsChart == 2) {
+          // clicking from left or eaten
+          if (pointIndex == 0) {
+            // clicking to waste
             print("going from left or eaten to waste");
             wasteChart = !wasteChart;
           }
           print("going between left and eaten charts");
           detailsChart = pointIndex;
-          if(pointIndex == 1){
+          if (pointIndex == 1) {
             foodEatenLeftAvo = foodLeftAvo;
             leftEatenStr = "Food Left";
-          }
-          else {
+          } else {
             foodEatenLeftAvo = foodEatenAvo;
             leftEatenStr = "Food Eaten";
           }
@@ -291,301 +421,487 @@ class _ChartPageState extends State<Charts> {
     });
   }
 
-
   Widget TextDis(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Container(
-          child: Center(
-            child: Column(
-              children: [
-                Text('aaaaaa')
-              ],
-            ),
+        body: Center(
+      child: Container(
+        child: Center(
+          child: Column(
+            children: [Text('aaaaaa')],
           ),
         ),
-      )
-    );
+      ),
+    ));
   }
-
-
 
   @override
-  Widget _buildChart(BuildContext context, List<Spending> saledata) {
+  Widget _buildChart(BuildContext context) {
     // bool _visible = true;
-    print("akdjhfaksdjhfksdjhf");
-    print(saledata[0].date.toDate().day);
-    print(DateFormat('EEEE').format(saledata[0].date.toDate()));
+    // //print("akdjhfaksdjhfksdjhf");
+    // //print(spendingData[0].date.toDate().day);
+    // //print(DateFormat('EEEE').format(spendingData[0].date.toDate()));
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Container(
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          child: Center(
+            child: Container(
             child: Column(
-              children: [
-                // GestureDetector(
-                //   behavior: HitTestBehavior.translucent,
-                //   onTap: (){
-                //     print("Container clicked");
-                //   },
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xFFFFFFFF),
-                      borderRadius: BorderRadius.circular(6),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFF828282).withOpacity(0.2),
-                          blurRadius: 23,
-                          spreadRadius: -4,
-                          offset: Offset(0, 4.0),
-                        ),
-                      ]),
-                    child: SfCircularChart(
-                      // title: ChartTitle(
-                      //   text: "Food usage"
-                      // ),
-                      legend: Legend(isVisible: true),
-                      // onChartTouchInteractionUp:(ChartTouchInteractionArgs args){
-                      //   print("AAAAAAAA am i touching this now???");
-                      //   // print(args);
-                      //   // print(args.position.dx.toString());
-                      //   // print(args.position.dy.toString());
-                      //   setVisibility();
-                      //   print(detailsChart);
-                      // },
-                      tooltipBehavior: TooltipBehavior(enable: true),
-                      series: <CircularSeries>[
-                        DoughnutSeries<ChartData, String>(
-                          dataSource: wasteData,
-                          explode: true,
-                          onPointTap: (ChartPointDetails details) {
-                            print("WTFFFF");
-                            print("Point index");
-                            print(details.pointIndex);
-                            // detailsChart = details.pointIndex!;
-                            print("series index");
-                            print(details.seriesIndex);
-                            setVisibility(details.pointIndex as int);
-                            // TextDis(context);
-                            // setState(() {
-                            //   _visible = !_visible;
-                            //   print("Changing visible");
-                            //   print(_visible);
-                            // });
-                          },
-                          selectionBehavior: SelectionBehavior(enable: true),
-                          pointColorMapper:(ChartData data,  _) => data.color,
-                          xValueMapper: (ChartData data, _) => data.x,
-                          yValueMapper: (ChartData data, _) => data.y,
-                          // name: ((ChartData data, _) => data.x) as String,
-                          dataLabelMapper: (ChartData data, _) => data.x,
-                          dataLabelSettings: DataLabelSettings(
-                            isVisible: true
-                          )
-                        )
-                      ]
-                    )
-                  // ),
-                ),
-                if(_visible) AnimatedOpacity(
-                  opacity: _visible ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 500),
-                  child: Container(
-                    child: Column(
-                      children: [
-                        if(wasteChart) SfCartesianChart(
-                          primaryYAxis: NumericAxis(
-                            minimum: 0,
-                            maximum: 100
-                          ),
-                          title: ChartTitle(
-                            text: "AAAAA",
-                            alignment: ChartAlignment.near
-                          ),
-                          primaryXAxis: CategoryAxis(),
-                          legend: Legend(
-                            isVisible: true,
-                            position: LegendPosition.top
-                            ),
-                            series: <CartesianSeries>[
-                              ColumnSeries<ChartData, String>(
-                                dataSource: (foodWasteAvo),
-                                // onPointTap: (ChartPointDetails details) {
-                                //   print(details.pointIndex);
-                                //   print(details.seriesIndex);
-                                // },
-                                // selectionBehavior: SelectionBehavior(enable: true),
-                                // dataLabelSettings: DataLabelSettings(isVisible: true),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(5),
-                                  topRight: Radius.circular(5)
-                                ),
-                                xValueMapper: (ChartData data, _) => data.x,
-                                yValueMapper: (ChartData data, _) => data.y,
-                                color: Color(0xFFFF4121),
-                                name: "Percentage"
-                              ),
-                            ]
-                          ),
-                          if(!wasteChart) SfCircularChart(
-                            // title: ChartTitle(
-                            //   text: "Food usage"
-                            // ),
-                            legend: Legend(isVisible: true),
-                            // onChartTouchInteractionUp:(ChartTouchInteractionArgs args){
-                            //   print("AAAAAAAA am i touching this now???");
-                            //   // print(args);
-                            //   // print(args.position.dx.toString());
-                            //   // print(args.position.dy.toString());
-                            //   setVisibility();
-                            //   print(detailsChart);
-                            // },
-                            tooltipBehavior: TooltipBehavior(enable: true),
-                            series: <CircularSeries>[
-                              DoughnutSeries<ChartData, String>(
-                                dataSource: foodEatenLeftAvo,
-                                explode: true,
-                                onPointTap: (ChartPointDetails details) {
-                                  print("WTFFFF");
-                                  print("Point index");
-                                  print(details.pointIndex);
-                                  detailsChart = details.pointIndex!;
-                                  print("series index");
-                                  print(details.seriesIndex);
-                                  // setVisibility();
-                                  // TextDis(context);
-                                  // setState(() {
-                                  //   _visible = !_visible;
-                                  //   print("Changing visible");
-                                  //   print(_visible);
-                                  // });
-                                },
-                                selectionBehavior: SelectionBehavior(enable: true),
-                                pointColorMapper:(ChartData data,  _) => data.color,
-                                xValueMapper: (ChartData data, _) => data.x,
-                                yValueMapper: (ChartData data, _) => data.y,
-                                // name: ((ChartData data, _) => data.x) as String,
-                                dataLabelMapper: (ChartData data, _) => data.x,
-                                dataLabelSettings: DataLabelSettings(
-                                  isVisible: true
-                                )
-                              )
-                            ]
-                          )
-                        // ChartDetails(pageType: "avocado",),
-                      ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: EdgeInsets.only(left: 39, top: 38),
+              child: Row(
+                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 83),
+                      child: Image.asset(
+                        'lib/images/logo.png',
+                        height: 23,
+                        width: 110,
+                      ),
                     ),
-                  ),
-                ),
-                if(!_visible) AnimatedOpacity(
-                  opacity: !_visible ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 500),
-                  child: Column(
-                    children: [
-                      Container(
+                    Padding(
+                      padding: const EdgeInsets.only(right: 15),
+                      child: Image.asset(
+                        'lib/images/notification.png',
+                        height: 52,
+                        width: 52,
+                      ),
+                    ),
+                    Image.asset(
+                      'lib/images/profile.png',
+                      height: 52,
+                      width: 52,
+                    ),
+                  ]),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 39, top: 30),
+              child: Text('Statistics',
+                  style: TextStyle(
+                      fontSize: 24,
+                      color: Color(0xFF4E4E4E),
+                      fontFamily: 'Montserat',
+                      fontWeight: FontWeight.w900)),
+            ),
+            SizedBox(
+              height: 17,
+            ),
+              Center(
+                child: Container(
+                // child: Expanded(
+                    child: Column(children: [
+                  // GestureDetector(
+                  //   behavior: HitTestBehavior.translucent,
+                  //   onTap: (){
+                  //     print("Container clicked");
+                  //   },
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4, bottom: 28),
+                    child: Container(
+                        height: 200,
+                        width: 312,
                         decoration: BoxDecoration(
-                          color: Color(0xFFFFFFFF),
-                          borderRadius: BorderRadius.circular(6),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xFF828282).withOpacity(0.2),
-                              blurRadius: 23,
-                              spreadRadius: -4,
-                              offset: Offset(0, 4.0),
-                            ),
-                          ]),
-                        child: SfCartesianChart(
-                          title: ChartTitle(
-                            text: "Spending",
-                            alignment: ChartAlignment.near
-                          ),
-                          primaryXAxis: CategoryAxis(),
-                          legend: Legend(
-                            isVisible: true,
-                            position: LegendPosition.top
-                            ),
-                            series: <CartesianSeries>[
-                              ColumnSeries<Spending, String>(
-                                dataSource: saledata,
-                                // onPointTap: (ChartPointDetails details) {
-                                //   print(details.pointIndex);
-                                //   print(details.seriesIndex);
-                                // },
-                                // selectionBehavior: SelectionBehavior(enable: true),
-                                // dataLabelSettings: DataLabelSettings(isVisible: true),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(5),
-                                  topRight: Radius.circular(5)
-                                ),
-                                xValueMapper: (Spending data, _) => DateFormat('EEEE').format(data.date.toDate()),
-                                yValueMapper: (Spending data, _) => data.price,
-                                color: Color(0xFF44ACA1),
-                                name: "Money Spent"
+                            color: Color(0xFFFFFFFF),
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xFF828282).withOpacity(0.2),
+                                blurRadius: 23,
+                                spreadRadius: -4,
+                                offset: Offset(0, 4.0),
                               ),
-                              ColumnSeries<Spending, String>(
-                                dataSource: saledata,
-                                // onPointTap: (ChartPointDetails details) {
-                                //   print(details.pointIndex);
-                                //   print(details.seriesIndex);
-                                // },
-                                // selectionBehavior: SelectionBehavior(enable: true),
-                                // dataLabelSettings: DataLabelSettings(isVisible: true),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(5),
-                                  topRight: Radius.circular(5)
-                                ),
-                                xValueMapper: (Spending data, _) => DateFormat('EEEE').format(data.date.toDate()),
-                                yValueMapper: (Spending data, _) => data.waste,
-                                color: Color(0xFFF7B24A),
-                                name: "Money Wasted"
-                              )
-                            ]
-                          )
-                        ),
-                        Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                            ]),
+                        child: Stack(
                           children: [
-                            Center(
+                            Positioned(
+                              top: 18,
+                              left: 20,
                               child: Container(
-                              height: 87,
-                              width: 156,
-                              decoration: BoxDecoration(
-                                  color: Color(0xFFFFFFFF),
-                                  borderRadius: BorderRadius.circular(6),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xFF828282).withOpacity(0.2),
-                                      blurRadius: 23,
-                                      spreadRadius: -4,
-                                      offset: Offset(0, 4.0),
-                                    ),
-                                  ]),
-                              child: Row(
-                              children: [
-                                Icon(
-                                  Icons.water_drop,
-                                  color: Colors.blue,
-                                  size: 30.0,
+                                height: 29,
+                                width: 29,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(3),
+                                  color: Color(0xFFF7B24A).withOpacity(0.2),
                                 ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text('Water Use'),
-                                  Text('320 L'),   // 320 liters per avocado https://greenly.earth/en-us/blog/ecology-news/what-is-the-avocados-environmental-impact
-                                ],
-                              )]
-                              )
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.2),
+                                  child: Image.asset(
+                                    'lib/images/veg.png',
+                                    height: 17,
+                                    width: 18.53,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                          Center(
-                            child: Container(
-                              height: 87,
-                              width: 156,
+                            Positioned(
+                                top: 26,
+                                left: 58,
+                                child: Text('Money spent in the past month',
+                                    style: TextStyle(
+                                        color: Color(0xFF4E4E4E),
+                                        fontSize: 12,
+                                        fontFamily: 'Montserat',
+                                        fontWeight: FontWeight.w700)),
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 40,
+                              ),
+                              child: SfCircularChart(
+                                  // title: ChartTitle(
+                                  //   text: "Food usage"
+                                  // ),
+                                  legend: Legend(isVisible: true),
+                                  // onChartTouchInteractionUp:(ChartTouchInteractionArgs args){
+                                  //   print("AAAAAAAA am i touching this now???");
+                                  //   // print(args);
+                                  //   // print(args.position.dx.toString());
+                                  //   // print(args.position.dy.toString());
+                                  //   setVisibility();
+                                  //   print(detailsChart);
+                                  // },
+                                  tooltipBehavior:
+                                      TooltipBehavior(enable: true),
+                                  series: <CircularSeries>[
+                                    DoughnutSeries<ChartData, String>(
+                                        dataSource: wasteData,
+                                        explode: true,
+                                        onPointTap:
+                                            (ChartPointDetails details) {
+                                          // print("WTFFFF");
+                                          // print("Point index");
+                                          // print(details.pointIndex);
+                                          // // detailsChart = details.pointIndex!;
+                                          // print("series index");
+                                          // print(details.seriesIndex);
+                                          setVisibility(
+                                              details.pointIndex as int);
+                                          // TextDis(context);
+                                          // setState(() {
+                                          //   _visible = !_visible;
+                                          //   print("Changing visible");
+                                          //   print(_visible);
+                                          // });
+                                        },
+                                        selectionBehavior:
+                                            SelectionBehavior(enable: true),
+                                        pointColorMapper: (ChartData data, _) =>
+                                            data.color,
+                                        xValueMapper: (ChartData data, _) =>
+                                            data.x,
+                                        yValueMapper: (ChartData data, _) =>
+                                            data.y,
+                                        // name: ((ChartData data, _) => data.x) as String,
+                                        //dataLabelMapper: (ChartData data, _) =>
+                                        //  data.x,
+                                        dataLabelSettings: DataLabelSettings(
+                                            isVisible: true,
+                                            labelPosition:
+                                                ChartDataLabelPosition.outside))
+                                  ]),
+                            ),
+                          ],
+                        )
+                        // ),
+                        ),
+                  ),
+                  if (_visible)
+                    AnimatedOpacity(
+                      opacity: _visible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 500),
+                      child: Container(
+                        child: Column(
+                          children: [
+                            if (wasteChart)
+                              Column(
+                                children: [
+                                  Container(
+                                    height: 328,
+                                    width: 312,
+                                    decoration: BoxDecoration(
+                                        color: Color(0xFFFFFFFF),
+                                        borderRadius: BorderRadius.circular(14),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xFF828282)
+                                                .withOpacity(0.2),
+                                            blurRadius: 23,
+                                            spreadRadius: -4,
+                                            offset: Offset(0, 4.0),
+                                          ),
+                                        ]),
+                                    child: Stack(
+                                      children: [
+                                        Positioned(
+                                          top: 26,
+                                          left: 27,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 14),
+                                            child: Container(
+                                              height: 14,
+                                              width: 14,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(3),
+                                                color: Color(0xFFF77F7C),
+                                              ),
+                                              /*child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(5.2),
+                                                child: Image.asset(
+                                                  'lib/images/veg.png',
+                                                  height: 17,
+                                                  width: 10,
+                                                ),
+                                              ),*/
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 26,
+                                          left: 58,
+                                          bottom: 14,
+                                          child: Text('Wasted items',
+                                              style: TextStyle(
+                                                  color: Color(0xFF4E4E4E),
+                                                  fontSize: 12,
+                                                  fontFamily: 'Montserat',
+                                                  fontWeight: FontWeight.w700)),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 20,
+                                              top: 40,
+                                              right: 20,
+                                              bottom: 18),
+                                          child: SfCartesianChart(
+                                              primaryYAxis: NumericAxis(
+                                                  labelFormat: '{value} %',
+                                                  labelStyle: TextStyle(
+                                                      color: Color(0xFFB1B1B1),
+                                                      fontFamily: 'Montserrat',
+                                                      fontSize: 10,
+                                                      //fontStyle: FontStyle.italic,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                  axisLine: AxisLine(
+                                                    color: Color(0xFFB1B1B1)
+                                                        .withOpacity(0.2),
+                                                    width: 0.6,
+                                                  ),
+                                                  majorGridLines:
+                                                      MajorGridLines(
+                                                    width: 0.6,
+                                                    color: Color(0xFFB1B1B1)
+                                                        .withOpacity(0.2),
+                                                  ),
+                                                  //dashArray: <double>[5, 5]),
+                                                  minorGridLines:
+                                                      MinorGridLines(
+                                                    width: 0.6,
+                                                    color: Color(0xFFB1B1B1)
+                                                        .withOpacity(0.2),
+                                                  ),
+                                                  minimum: 0,
+                                                  maximum: 100),
+                                              title: ChartTitle(
+                                                  //text: "AAAAA",
+                                                  alignment:
+                                                      ChartAlignment.near),
+                                              primaryXAxis: CategoryAxis(
+                                                labelStyle: TextStyle(
+                                                    color: Color(0xFFB1B1B1),
+                                                    fontFamily: 'Montserrat',
+                                                    fontSize: 10,
+                                                    //fontStyle: FontStyle.italic,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                                axisLine: AxisLine(
+                                                  color: Color(0xFFB1B1B1)
+                                                      .withOpacity(0.2),
+                                                  width: 0.6,
+                                                ),
+                                                majorGridLines: MajorGridLines(
+                                                  width: 0.1,
+                                                  color: Color(0xFFB1B1B1)
+                                                      .withOpacity(0.2),
+                                                ),
+                                                //dashArray: <double>[5, 5]),
+                                                minorGridLines: MinorGridLines(
+                                                  width: 0.1,
+                                                  color: Color(0xFFB1B1B1)
+                                                      .withOpacity(0.2),
+                                                ),
+                                                // dashArray: <double>[5, 5]),
+                                                //minorTicksPerInterval: 1),
+                                              ),
+                                              legend: Legend(
+                                                  isVisible: true,
+                                                  position: LegendPosition.top),
+                                              series: <CartesianSeries>[
+                                                ColumnSeries<ChartData, String>(
+                                                    dataSource: (foodWasteAvo),
+                                                    // onPointTap: (ChartPointDetails details) {
+                                                    //   print(details.pointIndex);
+                                                    //   print(details.seriesIndex);
+                                                    // },
+                                                    // selectionBehavior: SelectionBehavior(enable: true),
+                                                    // dataLabelSettings: DataLabelSettings(isVisible: true),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                            topLeft: Radius
+                                                                .circular(5),
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    5)),
+                                                    xValueMapper:
+                                                        (ChartData data, _) =>
+                                                            data.x,
+                                                    yValueMapper:
+                                                        (ChartData data, _) =>
+                                                            data.y,
+                                                    color: Color(0xFFFF4121),
+                                                    name: "Percentage"),
+                                              ]),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            if (!wasteChart) //HEREEEEEEEEEEEEEEEEEEEEEEE
+
+                              Container(
+                                height: 200,
+                                width: 312,
+                                decoration: BoxDecoration(
+                                    color: Color(0xFFFFFFFF),
+                                    borderRadius: BorderRadius.circular(14),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            Color(0xFF828282).withOpacity(0.2),
+                                        blurRadius: 23,
+                                        spreadRadius: -4,
+                                        offset: Offset(0, 4.0),
+                                      ),
+                                    ]),
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      top: 26,
+                                      left: 27,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 14),
+                                        child: Container(
+                                          height: 14,
+                                          width: 14,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(3),
+                                            color: Color(0xFF44ACA1),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 26,
+                                      left: 58,
+                                      bottom: 14,
+                                      child: Text('Eaten items',
+                                          style: TextStyle(
+                                              color: Color(0xFF4E4E4E),
+                                              fontSize: 12,
+                                              fontFamily: 'Montserat',
+                                              fontWeight: FontWeight.w700)),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 40, left: 20),
+                                      child: SfCircularChart(
+                                          // title: ChartTitle(
+                                          //   text: "Food usage"
+                                          // ),
+                                          legend: Legend(isVisible: true),
+                                          // onChartTouchInteractionUp:(ChartTouchInteractionArgs args){
+                                          //   print("AAAAAAAA am i touching this now???");
+                                          //   // print(args);
+                                          //   // print(args.position.dx.toString());
+                                          //   // print(args.position.dy.toString());
+                                          //   setVisibility();
+                                          //   print(detailsChart);
+                                          // },
+                                          tooltipBehavior:
+                                              TooltipBehavior(enable: true),
+                                          series: <CircularSeries>[
+                                            DoughnutSeries<ChartData, String>(
+                                                dataSource: foodEatenLeftAvo,
+                                                explode: true,
+                                                onPointTap: (ChartPointDetails
+                                                    details) {
+                                                  print("WTFFFF");
+                                                  print("Point index");
+                                                  print(details.pointIndex);
+                                                  detailsChart =
+                                                      details.pointIndex!;
+                                                  print("series index");
+                                                  print(details.seriesIndex);
+                                                  // setVisibility();
+                                                  // TextDis(context);
+                                                  // setState(() {
+                                                  //   _visible = !_visible;
+                                                  //   print("Changing visible");
+                                                  //   print(_visible);
+                                                  // });
+                                                },
+                                                selectionBehavior:
+                                                    SelectionBehavior(
+                                                        enable: true),
+                                                pointColorMapper:
+                                                    (ChartData data, _) =>
+                                                        data.color,
+                                                xValueMapper:
+                                                    (ChartData data, _) =>
+                                                        data.x,
+                                                yValueMapper:
+                                                    (ChartData data, _) =>
+                                                        data.y,
+                                                // name: ((ChartData data, _) => data.x) as String,
+                                                dataLabelMapper:
+                                                    (ChartData data, _) =>
+                                                        data.x,
+                                                dataLabelSettings:
+                                                    DataLabelSettings(
+                                                        isVisible: true,
+                                                        labelPosition:
+                                                            ChartDataLabelPosition
+                                                                .outside))
+                                          ]),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            // ChartDetails(pageType: "avocado",),
+                          ],
+                        ),
+                      ),
+                    ),
+                  if (!_visible)
+                    AnimatedOpacity(
+                        opacity: !_visible ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 500),
+                        child: Column(children: [
+                          Container(
+                              height: 328,
+                              width: 312,
                               decoration: BoxDecoration(
                                   color: Color(0xFFFFFFFF),
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(14),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Color(0xFF828282).withOpacity(0.2),
@@ -594,39 +910,389 @@ class _ChartPageState extends State<Charts> {
                                       offset: Offset(0, 4.0),
                                     ),
                                   ]),
-                              child: Row(
-                              children: [
-                                Icon(
-                                  Icons.cloud,
-                                  color: Colors.black,
-                                  size: 30.0,
-                                ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                children:[
-                                  Text('CO2 Emissions'),
-                                  Text('425 g'),   // 850 g for 2 avocados https://8billiontrees.com/carbon-offsets-credits/carbon-ecological-footprint-calculators/carbon-footprint-of-avocado/#:~:text=The%20carbon%20footprint%20of%20two%20avocados%20is%20rated%20at%20850%20grams
-                                ]
-                              )
-                              ]
-                              )
-                            )
-                          )
-                        ],
-                      )
-                    ]
-                  )
-                )
-              ]
-            )
-          ),
-        )
-      )
-    );
-  }
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    top: 18,
+                                    left: 20,
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 14),
+                                      child: Container(
+                                        height: 29,
+                                        width: 29,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(3),
+                                          color: Color(0xFFF77F7C)
+                                              .withOpacity(0.2),
+                                        ),
+                                        child: Image.asset(
+                                          'lib/images/money.png',
+                                          height: 17,
+                                          width: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                      top: 26,
+                                      left: 58,
+                                      bottom: 14,
+                                      child: Text('Spendings',
+                                          style: TextStyle(
+                                              color: Color(0xFF4E4E4E),
+                                              fontSize: 12,
+                                              fontFamily: 'Montserat',
+                                              fontWeight: FontWeight.w700)),
+                                    ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 20,
+                                        top: 40,
+                                        right: 20,
+                                        bottom: 18),
+                                    child: SfCartesianChart(
+                                        /* title: ChartTitle(
+                                    text: "Spendings",
+                                    
+                                    textStyle: TextStyle(
+                                        color: Color(0xFF4E4E4E),
+                                        fontSize: 12,
+                                        fontFamily: 'Montserat',
+                                        fontWeight: FontWeight.w700),
+                                    alignment: ChartAlignment.near),*/
+                                        /*primaryYAxis: CategoryAxis(
+                                  title: AxisTitle(
+                                      text: 'DKK',
+                                      textStyle: TextStyle(
+                                          color: Color(0xFF4E4E4E),
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 10,
+                                          //fontStyle: FontStyle.italic,
+                                          fontWeight: FontWeight.w500)),
+                                    ),*/
+                                        primaryYAxis: NumericAxis(
+                                          // '°C' will be append to all the labels in Y axis
+                                          labelFormat: '{value} DKK',
+                                          labelStyle: TextStyle(
+                                              color: Color(0xFFB1B1B1),
+                                              fontFamily: 'Montserrat',
+                                              fontSize: 10,
+                                              //fontStyle: FontStyle.italic,
+                                              fontWeight: FontWeight.w500),
+                                          axisLine: AxisLine(
+                                            color: Color(0xFFB1B1B1)
+                                                .withOpacity(0.2),
+                                            width: 0.6,
+                                          ),
+                                          majorGridLines: MajorGridLines(
+                                            width: 0.6,
+                                            color: Color(0xFFB1B1B1)
+                                                .withOpacity(0.2),
+                                          ),
+                                          //dashArray: <double>[5, 5]),
+                                          minorGridLines: MinorGridLines(
+                                            width: 0.6,
+                                            color: Color(0xFFB1B1B1)
+                                                .withOpacity(0.2),
+                                          ),
+                                        ),
+                                        primaryXAxis: CategoryAxis(
+                                          labelStyle: TextStyle(
+                                              color: Color(0xFFB1B1B1),
+                                              fontFamily: 'Montserrat',
+                                              fontSize: 10,
+                                              //fontStyle: FontStyle.italic,
+                                              fontWeight: FontWeight.w500),
+                                          axisLine: AxisLine(
+                                            color: Color(0xFFB1B1B1)
+                                                .withOpacity(0.2),
+                                            width: 0.6,
+                                          ),
+                                          majorGridLines: MajorGridLines(
+                                            width: 0.1,
+                                            color: Color(0xFFB1B1B1)
+                                                .withOpacity(0.2),
+                                          ),
+                                          //dashArray: <double>[5, 5]),
+                                          minorGridLines: MinorGridLines(
+                                            width: 0.1,
+                                            color: Color(0xFFB1B1B1)
+                                                .withOpacity(0.2),
+                                          ),
+                                          // dashArray: <double>[5, 5]),
+                                          //minorTicksPerInterval: 1),
+                                        ),
+                                        legend: Legend(
+                                          isVisible: true,
+                                          //image: AssetImage('images/truck_legend.png'),
+                                          // offset: Offset(2, 2)),
+                                          position: LegendPosition.top,
+                                          //offset: Offset(2, 2),
+                                        ),
+                                        series: <CartesianSeries>[
+                                          ColumnSeries<Spending, String>(
+                                              dataSource: spendingData,
+                                              // onPointTap: (ChartPointDetails details) {
+                                              //   print(details.pointIndex);
+                                              //   print(details.seriesIndex);
+                                              // },
+                                              // selectionBehavior: SelectionBehavior(enable: true),
+                                              // dataLabelSettings: DataLabelSettings(isVisible: true),
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(3),
+                                                  topRight: Radius.circular(3)),
+                                              xValueMapper:
+                                                  (Spending data, _) =>
+                                                      data.date,
+                                              yValueMapper:
+                                                  (Spending data, _) =>
+                                                      data.price,
+                                              color: Color(0xFFF7B24A),
+                                              name: "Monthly"),
+                                          ColumnSeries<Spending, String>(
+                                              dataSource: spendingData,
+                                              // onPointTap: (ChartPointDetails details) {
+                                              //   print(details.pointIndex);
+                                              //   print(details.seriesIndex);
+                                              // },
+                                              // selectionBehavior: SelectionBehavior(enable: true),
+                                              // dataLabelSettings: DataLabelSettings(isVisible: true),
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(3),
+                                                  topRight: Radius.circular(3)),
+                                              xValueMapper:
+                                                  (Spending data, _) =>
+                                                      data.date,
+                                              yValueMapper:
+                                                  (Spending data, _) =>
+                                                      data.waste,
+                                              color: Color(0xFFF77F7C),
+                                              name: "Expired item expense")
+                                        ]),
+                                  ),
+                                ],
+                              )),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 28, left: 39, bottom: 40),
+                                child: Container(
+                                    height: 125,
+                                    width: 145,
+                                    decoration: BoxDecoration(
+                                        color: Color(0xFFFFFFFF),
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xFF828282)
+                                                .withOpacity(0.2),
+                                            blurRadius: 23,
+                                            spreadRadius: -4,
+                                            offset: Offset(0, 4.0),
+                                          ),
+                                        ]),
+                                    child: Stack(children: [
+                                      Positioned(
+                                        top: 18,
+                                        left: 20,
+                                        child: Container(
+                                          height: 29,
+                                          width: 29,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(3),
+                                            color: Color(0xFF6192DA)
+                                                .withOpacity(0.2),
+                                          ),
+                                          child: Image.asset(
+                                            'lib/images/water.png',
+                                            height: 15,
+                                            width: 10,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 19,
+                                        left: 58,
+                                        child: Text('Water',
+                                            style: TextStyle(
+                                                color: Color(0xFF4E4E4E),
+                                                fontSize: 12,
+                                                fontFamily: 'Montserat',
+                                                fontWeight: FontWeight.w700)),
+                                      ),
+                                      Positioned(
+                                        top: 34,
+                                        left: 58,
+                                        child: Text('use',
+                                            style: TextStyle(
+                                                color: Color(0xFF4E4E4E),
+                                                fontSize: 12,
+                                                fontFamily: 'Montserat',
+                                                fontWeight: FontWeight.w700)),
+                                      ),
+                                      Positioned(
+                                        top: 61,
+                                        left: 20,
+                                        child: Text('Average',
+                                            style: TextStyle(
+                                                color: Color(0xFFABABAB),
+                                                fontSize: 12,
+                                                fontFamily: 'Montserat',
+                                                fontWeight: FontWeight.w500)),
+                                      ),
+                                      Positioned(
+                                        top: 84,
+                                        left: 20,
+                                        child: Text('320 l',
+                                            style: TextStyle(
+                                                color: Color(0xFF4E4E4E),
+                                                fontSize: 22,
+                                                fontFamily: 'Montserat',
+                                                fontWeight: FontWeight.w500)),
+                                      ),
+                                      /*Icon(
+                                    Icons.water_drop,
+                                    color: Colors.blue,
+                                    size: 30.0,
+                                  ),*/
+                                      /* Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('Water Use',
+                                          style: TextStyle(
+                                              color: Color(0xFF4E4E4E),
+                                              fontSize: 12,
+                                              fontFamily: 'Montserat',
+                                              fontWeight: FontWeight.w700)),
+                                      Text(
+                                          '320 L'), // 320 liters per avocado https://greenly.earth/en-us/blog/ecology-news/what-is-the-avocados-environmental-impact
+                                    ],
+                                  )*/
+                                    ])),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 28, left: 22, right: 39),
+                                child: Container(
+                                    height: 125,
+                                    width: 145,
+                                    decoration: BoxDecoration(
+                                        color: Color(0xFFFFFFFF),
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xFF828282)
+                                                .withOpacity(0.2),
+                                            blurRadius: 23,
+                                            spreadRadius: -4,
+                                            offset: Offset(0, 4.0),
+                                          ),
+                                        ]),
+                                    child: Stack(
+                                        //crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Positioned(
+                                            top: 18,
+                                            left: 20,
+                                            child: Container(
+                                              height: 29,
+                                              width: 29,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(3),
+                                                color: Color(0xFF44ACA1)
+                                                    .withOpacity(0.2),
+                                              ),
+                                              child: Image.asset(
+                                                'lib/images/cloud.png',
+                                                height: 11,
+                                                width: 20,
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 19,
+                                            left: 58,
+                                            child: Text('CO2',
+                                                style: TextStyle(
+                                                    color: Color(0xFF4E4E4E),
+                                                    fontSize: 12,
+                                                    fontFamily: 'Montserat',
+                                                    fontWeight:
+                                                        FontWeight.w700)),
+                                          ),
+                                          Positioned(
+                                            top: 34,
+                                            left: 58,
+                                            child: Text('emissions',
+                                                style: TextStyle(
+                                                    color: Color(0xFF4E4E4E),
+                                                    fontSize: 12,
+                                                    fontFamily: 'Montserat',
+                                                    fontWeight:
+                                                        FontWeight.w700)),
+                                          ),
+                                          Positioned(
+                                            top: 61,
+                                            left: 20,
+                                            child: Text('Average',
+                                                style: TextStyle(
+                                                    color: Color(0xFFABABAB),
+                                                    fontSize: 12,
+                                                    fontFamily: 'Montserat',
+                                                    fontWeight:
+                                                        FontWeight.w500)),
+                                          ),
+                                          Positioned(
+                                            top: 84,
+                                            left: 20,
+                                            child: Text('425 g',
+                                                style: TextStyle(
+                                                    color: Color(0xFF4E4E4E),
+                                                    fontSize: 22,
+                                                    fontFamily: 'Montserat',
+                                                    fontWeight:
+                                                        FontWeight.w500)),
+                                          ),
 
-     
+                                          /*Icon(
+                                    Icons.cloud,
+                                    color: Colors.black,
+                                    size: 30.0,
+                                  ),*/
+                                          /* Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text('CO2 Emissions',
+                                            style: TextStyle(
+                                                color: Color(0xFF4E4E4E),
+                                                fontSize: 12,
+                                                fontFamily: 'Montserat',
+                                                fontWeight: FontWeight.w700)),
+                                        Text(
+                                            '425 g'), // 850 g for 2 avocados https://8billiontrees.com/carbon-offsets-credits/carbon-ecological-footprint-calculators/carbon-footprint-of-avocado/#:~:text=The%20carbon%20footprint%20of%20two%20avocados%20is%20rated%20at%20850%20grams
+                                      ])*/
+                                        ])),
+                              )
+                            ],
+                          )
+                        ]))
+                ])
+                // ),
+              ),
+            ),
+          ],
+        )))));
+  }
 }
 
 
@@ -692,8 +1358,8 @@ class _ChartPageState extends State<Charts> {
 //       },
 //     );
 //   }
-//   Widget _buildChart(BuildContext context, List<Spending> saledata) {
-//     mydata = saledata;
+//   Widget _buildChart(BuildContext context, List<Spending> spendingData) {
+//     mydata = spendingData;
 //     _generateData(mydata);
 //     return AspectRatio(
 //       aspectRatio: 2,

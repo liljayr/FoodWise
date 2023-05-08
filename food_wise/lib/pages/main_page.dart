@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:food_wise/pages/add_item_page.dart';
 import '../firebase_options.dart';
+import 'add_item_page.dart';
 import 'chart_page.dart';
 import 'home_page.dart';
 import 'news_page.dart';
@@ -65,8 +66,7 @@ class _MainPageState extends State<Main> {
               MaterialPageRoute(builder: (context) => AddItem()),
             );
           },
-          child: Image.asset('lib/icons/plus.png',
-              height: 27, width: 27, color: Colors.white),
+          child: const Icon(Icons.add),
           backgroundColor: Color(0xFF44ACA1),
         ),
       ),
@@ -101,11 +101,11 @@ class _MainPageState extends State<Main> {
                 icon: Image.asset('lib/icons/home.png', height: 24, width: 28),
                 label: "Home"),
             BottomNavigationBarItem(
-                icon: Image.asset('lib/icons/recipes.png',
+                icon: Image.asset('lib/icons/stats.png',
                     height: 26.2, width: 17.3),
                 label: "Charts"),
             BottomNavigationBarItem(
-                icon: Image.asset('lib/icons/stats.png', height: 25, width: 27),
+                icon: Image.asset('lib/icons/recipes.png', height: 25, width: 27),
                 label: "Recipes"),
             BottomNavigationBarItem(
                 icon: Image.asset('lib/icons/insights.png',
