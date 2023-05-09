@@ -105,12 +105,12 @@ class _ChartPageState extends State<Charts> {
 
   Future<int> Emissions(String polluter, String product) async{
     var collection = FirebaseFirestore.instance.collection('Avocado$polluter');
-    print('Avocado$polluter');
+    // print('Avocado$polluter');
     var snapshot = await collection.get();
     var emission = snapshot.docs.where((element) => element['product'].toLowerCase() == product.toLowerCase()).first['Emission'];
     // print("YAYAYAYAYAY$emission");
-    print("Emission");
-    print(emission);
+    // print("Emission");
+    // print(emission);
     return emission;
   }
 
@@ -119,8 +119,8 @@ class _ChartPageState extends State<Charts> {
     var snapshotEaten = await collectionEaten.get();
     var dataList = snapshotEaten.docs.toList();
     for(int i=0; i<dataList.length; i++){
-      print("What item $i");
-      print(dataList[i]['name']);
+      // print("What item $i");
+      // print(dataList[i]['name']);
       var co2Emission = await Emissions('CO2', dataList[i]['name']);
       var h2oEmission = await Emissions('H2O', dataList[i]['name']);
       // print('$database $numItems');
@@ -135,7 +135,11 @@ class _ChartPageState extends State<Charts> {
         // print(value.y);
       }
       else{
-        var new_data = ChartData(dataList[i]['category'], dataList[i]['quantity'], Color(int.parse(dataList[i]['color'])));
+        // print(dataList[i]['category']);
+        // print(dataList[i]['quantity']);
+        // print(Color(int.parse(dataList[i]['color'])));
+        var color = int.parse(dataList[i]['color']);
+        var new_data = ChartData(dataList[i]['category'], dataList[i]['quantity'].toDouble(), Color(color));
         finalList.add(new_data);
       }
       co2TotalEmission = co2TotalEmission + co2Emission*dataList[i]['quantity'] as int;
@@ -156,17 +160,17 @@ class _ChartPageState extends State<Charts> {
       count = count + dataList[i].y;
       // print(dataList[i].y);
     }
-    print("COUNT FOR PERCENTAGEE $count");
+    // print("COUNT FOR PERCENTAGEE $count");
     for(int i=0; i<dataList.length; i++){
-      print("IS THIS TRUE OR NOT??????");
+      // print("IS THIS TRUE OR NOT??????");
       // if(finalList.any((item) => item.x == dataList[i].x)){
       //   print(finalList.any((item) => item.x == dataList[i].x));
       // }
       // else{
-        print("PERCENTAGEEEE");
+        // print("PERCENTAGEEEE");
         var item = dataList[i].y;
-        print("Here is the count $count, and the list number $item");
-        print((item/count)*100);
+        // print("Here is the count $count, and the list number $item");
+        // print((item/count)*100);
         finalList.add(ChartData(dataList[i].x, ((item/count)*100), dataList[i].color));
       // }
     }
@@ -189,16 +193,19 @@ class _ChartPageState extends State<Charts> {
       ChangeColor(e.get('waste'), "waste"))).toList();
     
     totalEaten = await loadList("AvocadoEaten", foodEatenAvo, totalEaten);
-    print("Did this work? eaten????");
-    print(foodEatenAvo.length);
+    print("EATEN");
+    // print("Did this work? eaten????");
+    // print(foodEatenAvo.length);
 
     // print("Get left food");
 
     totalLeft = await loadList('AvocadoFood', foodLeftAvo, totalLeft);
-    print("Did this work? food????");
-    print(foodLeftAvo.length);
+    print("LEFT");
+    // print("Did this work? food????");
+    // print(foodLeftAvo.length);
       
     totalWaste = await loadList('AvocadoWasted', foodWasteAvoOG, totalWaste);
+    print("WASTE");
     // print("Did this work? waste????");
     // print("WWWAAAASSSSTTTEEEE");
     // print(foodWasteAvo.length);
@@ -207,15 +214,16 @@ class _ChartPageState extends State<Charts> {
       foodWasteAvo = percentage(foodWasteAvoOG);
     }
 
-    print("Is the total correct $numItems items, $totalLeft left, $totalEaten eaten, $totalWaste");
-    print("Emissions $co2TotalEmission co2, $h2oTotalEmission h2o");
+    // print("Is the total correct $numItems items, $totalLeft left, $totalEaten eaten, $totalWaste");
+    // print("Emissions $co2TotalEmission co2, $h2oTotalEmission h2o");
 
     // numItems = (numItems/2).round();
 
     co2TotalEmission = (co2TotalEmission/numItems).round();
     h2oTotalEmission = (h2oTotalEmission/numItems).round();
-    print("Is the total correct $numItems items, $totalLeft left, $totalEaten eaten, $totalWaste");
-    print("Emissions $co2TotalEmission co2, $h2oTotalEmission h2o");
+    print("EMISSION");
+    // print("Is the total correct $numItems items, $totalLeft left, $totalEaten eaten, $totalWaste");
+    // print("Emissions $co2TotalEmission co2, $h2oTotalEmission h2o");
 
     // print("WASTE AND STUFF");
     // print((totalWaste/numItems)*100);
@@ -231,8 +239,9 @@ class _ChartPageState extends State<Charts> {
       ChartData('Left', ((totalLeft/totalItems)*100).roundToDouble(), Color(0xFFF7B24A)),
       ChartData('Eaten', ((totalEaten/totalItems)*100).roundToDouble(), Color(0xFF44ACA1))
     ];
-    print("Waste data has items!");
-    print(wasteData);
+    // print("Waste data has items!");
+    // print(wasteData);
+    print("DONE");
     return spendingData;
   }
 
@@ -250,8 +259,10 @@ class _ChartPageState extends State<Charts> {
       future: onLoad(),
       builder: (context, snapshot){
         if(snapshot.hasData){
+          print("WOOHOO");
           return _buildChart(context);
         }
+        print("NOOOOOOOO");
         return Center(
           child: CircularProgressIndicator()
         );
