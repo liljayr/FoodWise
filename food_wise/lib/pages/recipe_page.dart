@@ -29,7 +29,7 @@ class _RecipesState extends State<Recipes> {
   }
 
   Future<List<String>> loadProductName() async {
-    var collection = FirebaseFirestore.instance.collection('Food');
+    var collection = FirebaseFirestore.instance.collection('AvocadoFood');
     var snapshot = await collection.get();
     List<String> productNames = [];
     for (var doc in snapshot.docs) {
